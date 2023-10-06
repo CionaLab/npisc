@@ -1,6 +1,6 @@
 import argparse
-import time
 import sys
+import time
 from typing import List, Tuple, Optional, Generator
 from urllib.parse import urlparse, urljoin
 
@@ -88,30 +88,30 @@ def main():
         "start_url", type=str, help="The starting URL for the scraping process"
     )
     parser.add_argument(
-        "--sleep",
-        "-s",
-        type=float,
-        default=0.5,
-        help="Duration to wait between requests in seconds. Default is 0.5 seconds.",
-    )
-    parser.add_argument(
-        "--ignore-ssl",
-        "-i",
-        action="store_true",
-        help="Ignore SSL certificate verification.",
-    )
-    parser.add_argument(
         "-o",
         "--output",
         type=argparse.FileType("w"),
         default=sys.stdout,
         help="Output file where the results should be written. Default is stdout.",
     )
+    parser.add_argument(
+        "--insecure",
+        "-n",
+        action="store_true",
+        help="Ignore SSL certificate verification.",
+    )
+    parser.add_argument(
+        "--sleep",
+        "-s",
+        type=float,
+        default=0.5,
+        help="Duration to wait between requests in seconds. Default is 0.5 seconds.",
+    )
 
     args = parser.parse_args()
 
     with args.output as output:
-        for link in scrape_website(args.start_url, args.sleep, not args.ignore_ssl):
+        for link in scrape_website(args.start_url, args.sleep, not args.insecure):
             output.write(f"{link}\n")
 
 

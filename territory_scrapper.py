@@ -1,7 +1,7 @@
 import argparse
+import csv
 import sys
 import time
-import csv
 from typing import List, Tuple, Optional
 
 import requests
