@@ -105,52 +105,53 @@ def pad_compatible(mat: pd.DataFrame, adata: anndata.AnnData) -> pd.DataFrame:
     return mat_padded
 
 
-def normalize_cols(mat: pd.DataFrame) -> pd.DataFrame:
+def split_adata(adata: anndata.AnnData, col: str) -> Dict[str, anndata.AnnData]:
     """
-    Normalize all column vectors in a matrix using L2 norm.
+    Splits an AnnData object into a dictionary of AnnData objects based on a column in adata.obs.
 
     Parameters:
-    - mat (pd.DataFrame): Input matrix.
+    - adata (anndata.AnnData): Input AnnData object.
+    - col (str): The column name in adata.obs based on which the splitting should be done.
 
     Returns:
-    - pd.DataFrame: Matrix with normalized column vectors.
+    - Dict[str, anndata.AnnData]: Dictionary with unique values from the column as keys and
+                                  respective sub-AnnData objects as values.
     """
 
-    # Calculate the L2 norm for each column
-    l2_norms = np.linalg.norm(mat.values, axis=0)
-
-    # Normalize each column by its L2 norm
-    normalized_mat = mat.divide(l2_norms, axis=1)
-
-    return normalized_mat
+    return {value: adata[adata.obs[col] == value] for value in adata.obs[col].unique()}
 
 
-def process_and_normalize(
-    df: pd.DataFrame, adata: anndata.AnnData
-) -> Dict[str, pd.DataFrame]:
+def get_cos_similarity(adata: anndata.AnnData, df: pd.DataFrame) -> pd.DataFrame:
     """
-    Split the DataFrame by stage, pad each split with the AnnData object,
-    and return a dictionary of normalized matrices.
+    Calculate the cosine similarity matrix using the matrix product of the AnnData object's data and the transposed DataFrame.
 
     Parameters:
-    - df (pd.DataFrame): DataFrame returned by preprocess_tsv.
-    - adata (anndata.AnnData): An AnnData object.
+    - adata (anndata.AnnData): Input AnnData object.
+    - df (pd.DataFrame): Input DataFrame.
 
     Returns:
-    - Dict[str, pd.DataFrame]: Dictionary with stage as keys and normalized matrices as values.
+    - pd.DataFrame: Cosine similarity matrix with row and column names restored and sorted.
     """
 
-    result_dict = {}
+    # Ensure df and adata have compatible columns
+    df_padded = pad_compatible(df, adata)
 
-    # Split DataFrame based on 'Stage' and process each split
-    for stage, stage_df in df.groupby("Stage"):
-        # Pad the DataFrame split with the AnnData object
-        padded_matrix = pad_compatible(build_from_df(stage_df), adata)
+    # Convert the DataFrame to numpy for efficient matrix operations
+    df_np = df_padded.to_numpy()
 
-        # Normalize the padded matrix
-        normalized_matrix = normalize_cols(padded_matrix)
+    # Normalize the matrices using L2 norm (axis=1 indicates row-wise normalization)
+    adata_norm = adata.X / np.linalg.norm(adata.X, axis=1)[:, np.newaxis]
+    df_norm = df_np / np.linalg.norm(df_np, axis=1)[:, np.newaxis]
 
-        # Store in the result dictionary
-        result_dict[stage] = normalized_matrix
+    # Calculate the dot product which gives cosine similarity
+    cos_sim = adata_norm.dot(df_norm.T)
 
-    return result_dict
+    # Convert the resulting numpy matrix back to a DataFrame
+    similarity_df = pd.DataFrame(
+        cos_sim, index=adata.obs_names, columns=df_padded.index
+    )
+
+    # Sort the row and column names
+    similarity_df = similarity_df.sort_index(axis=0).sort_index(axis=1).fillna(0)
+
+    return similarity_df
