@@ -1,4 +1,6 @@
-from typing import Dict, Union, Tuple
+from typing import Dict, Union, Tuple, Iterable
+from itertools import tee
+import re
 import numpy as np
 import pandas as pd
 import anndata
@@ -198,3 +200,71 @@ def get_cos_similarity(
     similarity_df = similarity_df.sort_index(axis=0).sort_index(axis=1)
 
     return similarity_df
+
+
+def pairwise(iterable: Iterable) -> Iterable[Tuple[int, int]]:
+    """
+    Return pairs of adjacent elements from the input iterable.
+
+    Parameters:
+    - iterable (Iterable): Input iterable.
+
+    Returns:
+    - Iterable[Tuple[int, int]]: Iterable producing pairs of adjacent elements.
+    """
+    a, b = tee(iterable)
+    next(b, None)
+    return zip(a, b)
+
+
+def parse_territory(territory: str) -> Tuple[str, int, int]:
+    """
+    Parse the territory string into its components: cell lineage, rounds of division, and cell number.
+
+    Parameters:
+    - territory (str): The territory string, e.g., "A9.32 cell pair".
+
+    Returns:
+    - Tuple[str, int, int]: A tuple with cell lineage, rounds of division, and cell number.
+    """
+    match = re.match(r"([ABab])(\d+)\.(\d+)", territory)
+    if match:
+        lineage, rounds, cell_num = match.groups()
+        return lineage, int(rounds), int(cell_num)
+    else:
+        return None, None, None
+
+
+def compute_stage_similarity(df: pd.DataFrame) -> Dict[Tuple[int, int], pd.DataFrame]:
+    """
+    Compute the cosine similarity between adjacency matrices of two adjacent division rounds.
+
+    Parameters:
+    - df (pd.DataFrame): The dataframe returned by preprocess_tsv.
+
+    Returns:
+    - Dict[Tuple[int, int], pd.DataFrame]: A dictionary where keys are tuples with two division rounds,
+                                           and values are dataframes of cosine similarity values between
+                                           the adjacency matrices of the two rounds.
+    """
+
+    # Apply the parse_territory function to the "Territory" column
+    df["Lineage"], df["Rounds"], df["Cell_Num"] = zip(
+        *df["Territory"].apply(parse_territory)
+    )
+
+    # Group the dataframe by the 'Rounds' column
+    grouped = {name: group for name, group in df.groupby("Rounds")}
+
+    # Build the adjacency matrix for each group
+    adj_matrices = {
+        round_num: build_from_df(round_df) for round_num, round_df in grouped.items()
+    }
+
+    # Calculate cosine similarity for adjacent groups using pairwise and dictionary comprehension
+    similarities = {
+        (round1, round2): get_cos_similarity(adj_matrices[round1], adj_matrices[round2])
+        for round1, round2 in pairwise(grouped.keys())
+    }
+
+    return similarities
