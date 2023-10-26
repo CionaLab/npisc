@@ -5,7 +5,7 @@ import networkx as nx
 
 def parse_obo(filename: str) -> Tuple[Dict[str, str], List[Tuple[str, str]]]:
     """
-    Parses an OBO file and returns terms and part_of relationships.
+    Parses an OBO file for nodes and relationships.
 
     Parameters:
     - filename (str): Path to the OBO file.
@@ -19,24 +19,44 @@ def parse_obo(filename: str) -> Tuple[Dict[str, str], List[Tuple[str, str]]]:
     relationships = []
 
     in_term = False
-    current_id = None
+    attributes = {}  # Dictionary to store parsed attributes for the current term
 
     with open(filename, "r") as f:
         for line in f:
             line = line.strip()
             if line == "[Term]":
                 in_term = True
+                attributes = {}  # Reset attributes dictionary for the new term
             elif line == "" and in_term:
+                # Only consider nodes that match our regex pattern
+                if "name" in attributes:
+                    terms[attributes.get("id")] = attributes.get("name")
+
+                # If there's a part_of relationship, add it to our relationships
+                if (
+                    "relationship" in attributes
+                    and "part_of" in attributes["relationship"]
+                ):
+                    relationships.append(
+                        (attributes["id"], attributes["relationship"].split()[1])
+                    )
+
                 in_term = False
-                current_id = None
             elif in_term:
-                if line.startswith("id:"):
-                    current_id = line.split(" ")[1]
-                elif line.startswith("name:"):
-                    terms[current_id] = line.split(": ")[1]
-                elif "relationship: part_of" in line:
-                    target_id = line.split(" ")[2]
-                    relationships.append((current_id, target_id))
+                # Parse line based on the "tag: value ! comment" specification
+                parts = line.split(": ", 1)  # Split at first occurrence of ": "
+                if len(parts) == 2:
+                    tag = parts[0].strip()
+                    value_comment = parts[1].split(" ! ")
+                    value = value_comment[0].strip()
+
+                    # Depending on the tag, process and store the value
+                    if tag == "id":
+                        attributes["id"] = value
+                    elif tag == "name":
+                        attributes["name"] = value
+                    elif tag == "relationship" and "part_of" in value:
+                        attributes["relationship"] = value
 
     return terms, relationships
 
