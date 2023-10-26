@@ -6,11 +6,16 @@ import pandas as pd
 import anndata
 from sklearn.preprocessing import normalize
 
+from .ontology import build_graph, node_to_leaves
 
-def preprocess_tsv(filepath: str, mapping_filepath: str) -> pd.DataFrame:
+
+def preprocess_tsv(
+    filepath: str, mapping_filepath: str, obo_filepath: str
+) -> pd.DataFrame:
     """
     Reads a TSV file and preprocesses it by extracting relevant information.
     It also maps the KH2012 gene model to the KY21 gene model using a provided mapping file.
+    Uses ontology information from OBO file to map territories to underlying blastomeres.
 
     The function extracts the stage in parentheses, the KH number, and the expression territory
     (cell) from the TSV rows. Columns with NaN values are dropped.
@@ -18,10 +23,16 @@ def preprocess_tsv(filepath: str, mapping_filepath: str) -> pd.DataFrame:
     Parameters:
     - filepath (str): Path to the TSV file.
     - mapping_filepath (str): Path to the TSV file containing the mapping between KH2012 and KY21.
+    - obo_filepath (str): Path to the OBO file.
 
     Returns:
     - pd.DataFrame: A preprocessed DataFrame.
     """
+
+    # Build graph from OBO file
+    graph = build_graph(obo_filepath)
+    # Create the mapping from nodes to their leaf nodes
+    map_blastomeres = node_to_leaves(graph)
 
     # Read the TSV file into a DataFrame
     df = pd.read_csv(
@@ -34,8 +45,9 @@ def preprocess_tsv(filepath: str, mapping_filepath: str) -> pd.DataFrame:
     # Extract the KH number using regex
     df["Gene"] = df["Gene"].str.extract(r"(KH2012:KH\.[A-Z]\d+\.\d+)", expand=False)
 
-    # Extract the expression territory using regex
-    df["Territory"] = df["Territory"].str.extract(r"([ABab]\d+\.\d+)", expand=False)
+    # Convert the Territory column to corresponding blastomeres using the ontology information
+    df["Territory"] = df["Territory"].map(map_blastomeres)
+    df = df.explode(column="Territory")
 
     # Load the mapping TSV into a DataFrame
     mapping_df = pd.read_csv(
@@ -217,20 +229,20 @@ def pairwise(iterable: Iterable) -> Iterable[Tuple[int, int]]:
     return zip(a, b)
 
 
-def parse_territory(territory: str) -> Tuple[str, int, int]:
+def parse_territory(territory: str) -> Tuple[str, int, str]:
     """
     Parse the territory string into its components: cell lineage, rounds of division, and cell number.
 
     Parameters:
-    - territory (str): The territory string, e.g., "A9.32 cell pair".
+    - territory (str): The territory string, e.g., "A9.32".
 
     Returns:
-    - Tuple[str, int, int]: A tuple with cell lineage, rounds of division, and cell number.
+    - Tuple[str, int, str]: A tuple with cell lineage, rounds of division, and cell number.
     """
-    match = re.match(r"([ABab])(\d+)\.(\d+)", territory)
+    match = re.match(r"^([ABab])(\d+)\.(\d+\**)$", territory)
     if match:
         lineage, rounds, cell_num = match.groups()
-        return lineage, int(rounds), int(cell_num)
+        return lineage, int(rounds), cell_num
     else:
         return None, None, None
 
