@@ -1,4 +1,5 @@
 from typing import List, Tuple, Optional, Dict
+import re
 import csv
 import networkx as nx
 
@@ -119,17 +120,19 @@ def node_to_leaves(graph: nx.DiGraph, node_attr="name") -> Dict[str, List[str]]:
     """
     # First, we reverse the graph to make it a tree (parent -> children).
     tree = nx.reverse(graph, copy=True)
+    # Compile regex pattern for efficiency and specificity
+    pattern = re.compile("^([ABab])(\d+)\.(\d+)")
 
     node_to_leaves = {}
     for node in tree.nodes:
-        node_name = tree.nodes[node].get(
-            node_attr, node
-        )  # Get the name of the node or use node ID if name isn't present.
-        leaves = find_leaves(tree, node)  # Find all leaves under this node.
-        leaves_names = [
-            tree.nodes[leaf].get(node_attr, leaf) for leaf in leaves
-        ]  # Convert node IDs to names or use the node ID if name is not present.
-        node_to_leaves[node_name] = leaves_names
+        if pattern.match(node_name := tree.nodes[node].get(node_attr)):
+            leaves = find_leaves(tree, node)  # Find all leaves under this node.
+            leaves_names = [
+                name
+                for leaf in leaves
+                if pattern.match(name := tree.nodes[leaf].get(node_attr))
+            ]  # Convert node IDs to names or use the node ID if name is not present.
+            node_to_leaves[node_name] = leaves_names
 
     return node_to_leaves
 
