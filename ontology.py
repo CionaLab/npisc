@@ -4,60 +4,104 @@ import csv
 import networkx as nx
 
 
-def parse_obo(filename: str) -> Tuple[Dict[str, str], List[Tuple[str, str]]]:
+class Term:
+    def __init__(
+        self,
+        id: str,
+        name: Optional[str] = None,
+        namespace: Optional[str] = None,
+        definition: Optional[str] = None,
+        is_a: Optional[str] = None,
+        relationship: Optional[Dict[str, List[str]]] = None,
+        synonyms: Optional[List[str]] = None,
+        references: Optional[List[str]] = None,
+    ):
+        self.id = id
+        self.name = name
+        self.namespace = namespace
+        self.definition = definition
+        self.is_a = is_a
+        self.relationship = relationship or {}
+        self.synonyms = synonyms or []
+        self.references = references or []
+
+    def __repr__(self):
+        return (
+            f"Term(id={self.id!r}, name={self.name!r}, namespace={self.namespace!r}, "
+            f"definition={self.definition!r}, is_a={self.is_a!r}, "
+            f"relationship={self.relationship!r}, synonyms={self.synonyms!r}, "
+            f"references={self.references!r})"
+        )
+
+
+def parse_obo(filename: str) -> Tuple[List[Term], List[Tuple[str, str]]]:
     """
-    Parses an OBO file for nodes and relationships.
+    Parses an OBO file to collect terms and their properties.
 
     Parameters:
     - filename (str): Path to the OBO file.
 
     Returns:
-    - Tuple[Dict[str, str], List[Tuple[str, str]]]:
-      - Dictionary of term IDs to term names.
-      - List of (source, target) tuples representing part_of relationships.
+    - Tuple[List[Term], List[Tuple[str, str]]]: A tuple containing two items:
+        1. A list of Term objects.
+        2. A list of tuples representing relationships where each tuple contains a term ID and the ID it is part of.
     """
-    terms = {}
+    terms = []
     relationships = []
-
     in_term = False
-    attributes = {}  # Dictionary to store parsed attributes for the current term
+    attributes = {}
 
     with open(filename, "r") as f:
         for line in f:
-            line = line.strip()
+            # Remove comment and strip whitespace
+            value_comment = line.split("!", 1)
+            line = value_comment[0].strip()
+
             if line == "[Term]":
                 in_term = True
-                attributes = {}  # Reset attributes dictionary for the new term
+                attributes = {}
             elif line == "" and in_term:
-                # Only consider nodes that match our regex pattern
-                if "name" in attributes:
-                    terms[attributes.get("id")] = attributes.get("name")
+                term = Term(
+                    id=attributes.get("id"),
+                    name=attributes.get("name"),
+                    namespace=attributes.get("namespace"),
+                    definition=attributes.get("def"),
+                    is_a=attributes.get("is_a"),
+                    relationship=attributes.get("relationship"),
+                    synonyms=attributes.get("synonym"),
+                    references=attributes.get("reference"),
+                )
+                terms.append(term)
 
-                # If there's a part_of relationship, add it to our relationships
+                # Store part_of relationships separately as tuples
                 if (
                     "relationship" in attributes
                     and "part_of" in attributes["relationship"]
                 ):
-                    relationships.append(
-                        (attributes["id"], attributes["relationship"].split()[1])
-                    )
+                    for target_id in attributes["relationship"]["part_of"]:
+                        relationships.append((term.id, target_id))
 
                 in_term = False
+                attributes = {}
             elif in_term:
-                # Parse line based on the "tag: value ! comment" specification
-                parts = line.split(": ", 1)  # Split at first occurrence of ": "
+                # Split at the first occurrence of ":"
+                parts = line.split(":", 1)
                 if len(parts) == 2:
                     tag = parts[0].strip()
-                    value_comment = parts[1].split(" ! ")
-                    value = value_comment[0].strip()
+                    value = parts[1].strip()
 
-                    # Depending on the tag, process and store the value
-                    if tag == "id":
-                        attributes["id"] = value
-                    elif tag == "name":
-                        attributes["name"] = value
-                    elif tag == "relationship" and "part_of" in value:
-                        attributes["relationship"] = value
+                    # Store relationships in a dictionary
+                    if tag == "relationship":
+                        rel_type, rel_value = value.split(" ", 1)
+                        attributes.setdefault("relationship", {}).setdefault(
+                            rel_type.strip(), []
+                        ).append(rel_value.strip())
+                    elif tag == "synonym":
+                        attributes.setdefault("synonym", []).append(value)
+                    elif tag == "reference":
+                        attributes.setdefault("reference", []).append(value)
+                    else:
+                        attributes[tag] = value
 
     return terms, relationships
 
@@ -75,8 +119,8 @@ def build_graph(filename: str) -> nx.DiGraph:
     terms, relationships = parse_obo(filename)
 
     G = nx.DiGraph()
-    for term_id, term_name in terms.items():
-        G.add_node(term_id, name=term_name)
+    for term in terms:
+        G.add_node(term.id, name=term.name)
 
     for source, target in relationships:
         G.add_edge(source, target, relationship="part_of")
