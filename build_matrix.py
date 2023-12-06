@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 import anndata
 from sklearn.preprocessing import normalize
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 from .ontology import build_graph, node_to_leaves
 
@@ -280,3 +282,66 @@ def compute_stage_similarity(df: pd.DataFrame) -> Dict[Tuple[int, int], pd.DataF
     }
 
     return similarities
+
+
+def find_similar_clusters(
+    adata1: anndata.AnnData, adata2: anndata.AnnData
+) -> pd.DataFrame:
+    """
+    Find the most similar Leiden cluster pairs between two AnnData objects.
+
+    Parameters:
+    - adata1 (anndata.AnnData): First AnnData object with Leiden clustering.
+    - adata2 (anndata.AnnData): Second AnnData object with Leiden clustering.
+
+    Returns:
+    - pd.DataFrame: A dataframe with the most similar Leiden cluster pairs and their average cosine similarity.
+    """
+
+    # Calculate cosine similarity using the existing function
+    cos_sim = get_cos_similarity(adata1, adata2)
+
+    # Group by Leiden clusters in adata1
+    group1 = adata1.obs["leiden"]
+    mean_sim1 = cos_sim.groupby(group1, axis=0).mean()
+
+    # Group by Leiden clusters in adata2
+    group2 = adata2.obs["leiden"]
+    mean_sim2 = mean_sim1.groupby(group2, axis=1).mean()
+
+    # Flatten the dataframe and reset index
+    flattened = mean_sim2.reset_index().melt(
+        id_vars="leiden", var_name="leiden_2", value_name="similarity"
+    )
+
+    # Sort by similarity and return
+    return flattened.sort_values(by="similarity", ascending=False).reset_index(
+        drop=True
+    )
+
+
+def plot_cluster_similarity(cluster_pairs: pd.DataFrame) -> None:
+    """
+    Unflatten the DataFrame and plot a heatmap and dendrogram of Leiden cluster similarities.
+
+    Parameters:
+    - cluster_pairs (pd.DataFrame): DataFrame with flattened Leiden cluster pairs and their similarities.
+
+    Returns:
+    - None: Displays a heatmap and dendrogram.
+    """
+
+    # Reshape the DataFrame to a square matrix
+    matrix = cluster_pairs.pivot(
+        index="leiden", columns="leiden_2", values="similarity"
+    )
+
+    # Fill diagonal and NaN values (if any) with 0 for better visualization
+    np.fill_diagonal(matrix.values, 0)
+    matrix = matrix.fillna(0)
+
+    # Plot heatmap and dendrogram using seaborn's clustermap
+    sns.clustermap(matrix, cmap="viridis", xticklabels=True, yticklabels=True)
+
+    # Display the plot
+    plt.show()
