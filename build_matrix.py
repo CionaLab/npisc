@@ -320,21 +320,16 @@ def find_similar_clusters(
     )
 
 
-def plot_cluster_similarity(cluster_pairs: pd.DataFrame) -> None:
+def plot_distance(matrix: pd.DataFrame) -> None:
     """
-    Unflatten the DataFrame and plot a heatmap and dendrogram of Leiden cluster similarities.
+    Plot a heatmap and dendrogram of a distance matrix.
 
     Parameters:
-    - cluster_pairs (pd.DataFrame): DataFrame with flattened Leiden cluster pairs and their similarities.
+    - matrix (pd.DataFrame): DataFrame with the distance matrix.
 
     Returns:
     - None: Displays a heatmap and dendrogram.
     """
-
-    # Reshape the DataFrame to a square matrix
-    matrix = cluster_pairs.pivot(
-        index="leiden", columns="leiden_2", values="similarity"
-    )
 
     # Fill diagonal and NaN values (if any) with 0 for better visualization
     np.fill_diagonal(matrix.values, 0)
