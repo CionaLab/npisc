@@ -2,6 +2,7 @@ from typing import Dict, Union, Tuple, Iterable
 from itertools import tee
 import re
 import numpy as np
+from scipy.spatial import distance
 import pandas as pd
 import anndata
 from sklearn.preprocessing import normalize
@@ -214,6 +215,55 @@ def get_cos_similarity(
     similarity_df = similarity_df.sort_index(axis=0).sort_index(axis=1)
 
     return similarity_df
+
+def get_mahalanobis_distance(
+    obj1: Union[anndata.AnnData, pd.DataFrame],
+    obj2: Union[anndata.AnnData, pd.DataFrame],
+) -> pd.DataFrame:
+    """
+    Compute the Mahalanobis distance between two objects (either AnnData or DataFrame).
+
+    Parameters:
+    - obj1 (Union[anndata.AnnData, pd.DataFrame]): First object (either AnnData or DataFrame).
+    - obj2 (Union[anndata.AnnData, pd.DataFrame]): Second object (either AnnData or DataFrame).
+
+    Returns:
+    - pd.DataFrame: A dataframe of Mahalanobis distance values.
+    """
+
+    # Convert AnnData to DataFrame if necessary
+    df1 = (
+        pd.DataFrame(obj1.X, columns=obj1.var_names, index=obj1.obs_names)
+        if isinstance(obj1, anndata.AnnData)
+        else obj1
+    )
+    df2 = (
+        pd.DataFrame(obj2.X, columns=obj2.var_names, index=obj2.obs_names)
+        if isinstance(obj2, anndata.AnnData)
+        else obj2
+    )
+
+    # Ensure both dataframes have the same columns
+    df1, df2 = pad_compatible(df1, df2)
+
+    # Convert dataframes to numpy arrays
+    arr1 = df1.to_numpy()
+    arr2 = df2.to_numpy()
+
+    # Calculate the covariance matrix
+    cov_matrix = np.cov(arr1.T)
+    inv_cov_matrix = np.linalg.inv(cov_matrix)
+
+    # Compute Mahalanobis distance
+    distance_matrix = distance.cdist(arr1, arr2, metric='mahalanobis', VI=inv_cov_matrix)
+
+    # Convert the result back to a dataframe with appropriate row and column names
+    distance_df = pd.DataFrame(distance_matrix, index=df1.index, columns=df2.index)
+
+    # Sort the result
+    distance_df = distance_df.sort_index(axis=0).sort_index(axis=1)
+
+    return distance_df
 
 
 def pairwise(iterable: Iterable) -> Iterable[Tuple[int, int]]:
