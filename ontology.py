@@ -1,4 +1,4 @@
-from typing import List, Tuple, Optional, Dict
+from typing import List, Tuple, Optional, Dict, Callable
 import re
 import csv
 import networkx as nx
@@ -218,30 +218,30 @@ def parse_obo(
     return terms, part_of, preceded_by
 
 
-def split_hierarchy(terms: List[Term]) -> Tuple[List[Term], List[Term], List[Term]]:
+def split_terms(
+    terms: List[Term], test_func: Callable[[Term], bool]
+) -> Tuple[List[Term], List[Term]]:
     """
-    Split a list of Term objects based on their names and separates them into three lists based on term ID prefixes.
+    Split a list of Term objects based on a test function and separates them into two lists.
 
     Parameters:
     - terms (List[Term]): The list of Term objects to be sorted.
+    - test_func (Callable[[Term], bool]): The test function that takes a Term object as input and returns a boolean value.
 
     Returns:
-    - Tuple[List[Term], List[Term], List[Term]]: A tuple containing three lists of Term objects, where the first list contains terms with ID starting with "CirobuA",
-      the second list contains terms with ID starting with "CirobuD", and the third list contains the remaining terms.
+    - Tuple[List[Term], List[Term]]: A tuple containing two lists of Term objects, where the first list contains terms for which the test function returns True,
+      and the second list contains terms for which the test function returns False.
     """
-    cirobua_terms = []
-    cirobud_terms = []
-    other_terms = []
+    true_terms = []
+    false_terms = []
 
     for term in terms:
-        if term.id.startswith("CirobuA"):
-            cirobua_terms.append(term)
-        elif term.id.startswith("CirobuD"):
-            cirobud_terms.append(term)
+        if test_func(term):
+            true_terms.append(term)
         else:
-            other_terms.append(term)
+            false_terms.append(term)
 
-    return cirobua_terms, cirobud_terms, other_terms
+    return true_terms, false_terms
 
 
 def build_graph(filename: str) -> Tuple[nx.DiGraph, nx.DiGraph]:
@@ -261,7 +261,8 @@ def build_graph(filename: str) -> Tuple[nx.DiGraph, nx.DiGraph]:
     G_cirobua = nx.DiGraph()
     G_cirobud = nx.DiGraph()
 
-    cirobua_terms, cirobud_terms, _ = split_hierarchy(terms)
+    cirobua_terms, rest = split_terms(terms, lambda x: x.id.startswith("CirobuA"))
+    cirobud_terms, _ = split_terms(rest, lambda x: x.id.startswith("CirobuD"))
 
     for term in cirobua_terms:
         G_cirobua.add_node(term.id, name=term.name)
