@@ -387,13 +387,13 @@ def node_to_leaves(graph: nx.DiGraph, node_attr="name") -> Dict[str, List[str]]:
 
     node_to_leaves = {}
     for node in tree.nodes:
-        if pattern.match(node_name := tree.nodes[node].get(node_attr)):
-            leaves = find_leaves(tree, node)  # Find all leaves under this node.
-            leaves_names = [
-                name
-                for leaf in leaves
-                if pattern.match(name := tree.nodes[leaf].get(node_attr))
-            ]  # Convert node IDs to names or use the node ID if name is not present.
+        node_name = tree.nodes[node].get(node_attr)
+        leaves = find_leaves(tree, node)  # Find all leaves under this node.
+        leaves_names = [
+            name for leaf in leaves
+            if pattern.match(name := tree.nodes[leaf].get(node_attr))
+        ]  # Convert node IDs to names or use the node ID if name is not present.
+        if leaves_names:
             node_to_leaves[node_name] = leaves_names
 
     return node_to_leaves
