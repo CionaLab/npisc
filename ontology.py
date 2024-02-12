@@ -1,5 +1,6 @@
 from typing import List, Tuple, Optional, Dict, Callable
 import re
+from collections import defaultdict
 import csv
 import networkx as nx
 
@@ -152,10 +153,36 @@ def parse_obo(
         3. A list of tuples representing preceded_by relationships where each tuple contains a term ID and the ID it is preceded by.
     """
     terms = []
-    part_of = []
-    preceded_by = []
+
+    tuples_attr = defaultdict(list)
+
     in_term = False
     attributes = {}
+
+    def parse_relationship(
+        term: Term, attributes: Dict[str, Dict[str, str]], attr: str
+    ) -> None:
+        if "relationship" in attributes and attr in attributes["relationship"]:
+            for target_id in attributes["relationship"][attr]:
+                tuples_attr[attr].append((term.id, target_id))
+
+    def clear_stack() -> None:
+
+        term = Term(
+            id=attributes.get("id"),
+            name=attributes.get("name"),
+            namespace=attributes.get("namespace"),
+            definition=attributes.get("def"),
+            is_a=attributes.get("is_a"),
+            relationship=attributes.get("relationship"),
+            synonyms=attributes.get("synonym"),
+            references=attributes.get("reference"),
+        )
+        terms.append(term)
+
+        # Store part_of and preceded_by relationships separately as tuples
+        parse_relationship(term, attributes, "part_of")
+        parse_relationship(term, attributes, "preceded_by")
 
     with open(filename, "r") as f:
         for line in f:
@@ -164,36 +191,10 @@ def parse_obo(
             line = value_comment[0].strip()
 
             if line == "[Term]":
+                if in_term:
+                    clear_stack()
+
                 in_term = True
-                attributes = {}
-            elif line == "" and in_term:
-                term = Term(
-                    id=attributes.get("id"),
-                    name=attributes.get("name"),
-                    namespace=attributes.get("namespace"),
-                    definition=attributes.get("def"),
-                    is_a=attributes.get("is_a"),
-                    relationship=attributes.get("relationship"),
-                    synonyms=attributes.get("synonym"),
-                    references=attributes.get("reference"),
-                )
-                terms.append(term)
-
-                # Store part_of and preceded_by relationships separately as tuples
-                if (
-                    "relationship" in attributes
-                    and "part_of" in attributes["relationship"]
-                ):
-                    for target_id in attributes["relationship"]["part_of"]:
-                        part_of.append((term.id, target_id))
-                if (
-                    "relationship" in attributes
-                    and "preceded_by" in attributes["relationship"]
-                ):
-                    for target_id in attributes["relationship"]["preceded_by"]:
-                        preceded_by.append((term.id, target_id))
-
-                in_term = False
                 attributes = {}
             elif in_term:
                 # Split at the first occurrence of ":"
@@ -215,7 +216,14 @@ def parse_obo(
                     else:
                         attributes[tag] = value
 
-    return terms, part_of, preceded_by
+    if not attributes:
+        clear_stack()
+
+    return (
+        terms,
+        tuples_attr["part_of"],
+        tuples_attr["preceded_by"],
+    )
 
 
 def split_terms(
