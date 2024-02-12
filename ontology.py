@@ -244,6 +244,32 @@ def split_terms(
     return true_terms, false_terms
 
 
+def filter_by_stage(
+    terms: List[Term], stage=DICT_STAGES["CirobuD:0000039"]
+) -> List[Term]:
+    """
+    Filters the list of terms based on the start and end relationships.
+
+    Parameters:
+    - terms (List[Term]): The list of terms to be filtered.
+    - stage (str): The stage to filter the terms by. Defaults to the stage "CirobuD:0000039".
+
+    Returns:
+    - List[Term]: The filtered list of terms.
+    """
+
+    def test_func(term: Term) -> bool:
+        try:
+            start_value = DICT_STAGES.get(term.relationship.get("start")[0])
+            end_value = DICT_STAGES.get(term.relationship.get("end")[0])
+            return start_value <= stage and stage <= end_value
+        except (KeyError, TypeError):
+            return False
+
+    true_terms, _ = split_terms(terms, test_func)
+    return true_terms
+
+
 def build_graph(filename: str) -> Tuple[nx.DiGraph, nx.DiGraph]:
     """
     Reads an OBO file and builds directed graphs based on the part_of and preceded_by relationships using networkx.
