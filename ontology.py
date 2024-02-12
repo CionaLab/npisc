@@ -106,6 +106,32 @@ def parse_obo(filename: str) -> Tuple[List[Term], List[Tuple[str, str]]]:
     return terms, relationships
 
 
+def split_hierarchy(terms: List[Term]) -> Tuple[List[Term], List[Term], List[Term]]:
+    """
+    Split a list of Term objects based on their names and separates them into three lists based on term ID prefixes.
+
+    Parameters:
+    - terms (List[Term]): The list of Term objects to be sorted.
+
+    Returns:
+    - Tuple[List[Term], List[Term], List[Term]]: A tuple containing three lists of Term objects, where the first list contains terms with ID starting with "CirobuA",
+      the second list contains terms with ID starting with "CirobuD", and the third list contains the remaining terms.
+    """
+    cirobua_terms = []
+    cirobud_terms = []
+    other_terms = []
+
+    for term in terms:
+        if term.id.startswith("CirobuA"):
+            cirobua_terms.append(term)
+        elif term.id.startswith("CirobuD"):
+            cirobud_terms.append(term)
+        else:
+            other_terms.append(term)
+
+    return cirobua_terms, cirobud_terms, other_terms
+
+
 def build_graph(filename: str) -> nx.DiGraph:
     """
     Reads an OBO file and builds a directed graph based on the part_of relationship using networkx.
