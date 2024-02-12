@@ -142,26 +142,36 @@ def split_hierarchy(terms: List[Term]) -> Tuple[List[Term], List[Term], List[Ter
     return cirobua_terms, cirobud_terms, other_terms
 
 
-def build_graph(filename: str) -> nx.DiGraph:
+def build_graph(filename: str) -> Tuple[nx.DiGraph, nx.DiGraph]:
     """
-    Reads an OBO file and builds a directed graph based on the part_of relationship using networkx.
+    Reads an OBO file and builds directed graphs based on the part_of and preceded_by relationships using networkx.
+    Separates the terms into two different trees based on their ID prefixes.
 
     Parameters:
     - filename (str): Path to the OBO file.
 
     Returns:
-    - nx.DiGraph: A directed graph representation of the OBO file based on the part_of relationship.
+    - Tuple[nx.DiGraph, nx.DiGraph]: Two directed graphs representing the OBO file based on the part_of and preceded_by relationships,
+      where the first graph contains the CirobuA terms and the second graph contains the CirobuD terms.
     """
-    terms, relationships = parse_obo(filename)
+    terms, part_of, preceded_by = parse_obo(filename)
 
-    G = nx.DiGraph()
-    for term in terms:
-        G.add_node(term.id, name=term.name)
+    G_cirobua = nx.DiGraph()
+    G_cirobud = nx.DiGraph()
 
-    for source, target in relationships:
-        G.add_edge(source, target, relationship="part_of")
+    cirobua_terms, cirobud_terms, _ = split_hierarchy(terms)
 
-    return G
+    for term in cirobua_terms:
+        G_cirobua.add_node(term.id, name=term.name)
+    for term in cirobud_terms:
+        G_cirobud.add_node(term.id, name=term.name)
+
+    for source, target in part_of:
+        G_cirobua.add_edge(source, target, relationship="part_of")
+    for source, target in preceded_by:
+        G_cirobud.add_edge(source, target, relationship="preceded_by")
+
+    return G_cirobua, G_cirobud
 
 
 def find_leaves(tree: nx.DiGraph, node: str) -> List[str]:
