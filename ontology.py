@@ -245,14 +245,17 @@ def split_terms(
 
 
 def filter_by_stage(
-    terms: List[Term], stage=DICT_STAGES["CirobuD:0000039"]
+    terms: List[Term],
+    start_stage: int = DICT_STAGES["CirobuD:0000035"],
+    end_stage: int = DICT_STAGES["CirobuD:0000039"],
 ) -> List[Term]:
     """
-    Filters the list of terms based on the start and end relationships.
+    Filters the list of terms based on the start and end relationships and returns the filtered list.
 
     Parameters:
     - terms (List[Term]): The list of terms to be filtered.
-    - stage (str): The stage to filter the terms by. Defaults to the stage "CirobuD:0000039".
+    - start_stage (int): The starting stage to filter the terms by.
+    - end_stage (int): The ending stage to filter the terms by.
 
     Returns:
     - List[Term]: The filtered list of terms.
@@ -262,7 +265,11 @@ def filter_by_stage(
         try:
             start_value = DICT_STAGES.get(term.relationship.get("start")[0])
             end_value = DICT_STAGES.get(term.relationship.get("end")[0])
-            return start_value <= stage and stage <= end_value
+
+            return (start_value <= start_stage and end_value >= start_stage) or (
+                start_value >= start_stage and start_value <= end_stage
+            )
+
         except (KeyError, TypeError):
             return False
 
