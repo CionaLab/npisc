@@ -174,6 +174,42 @@ def build_graph(filename: str) -> Tuple[nx.DiGraph, nx.DiGraph]:
     return G_cirobua, G_cirobud
 
 
+def get_linked_lists(graph: nx.DiGraph) -> List[List[Tuple[str, str]]]:
+    """
+    Returns a list of linked lists in the given directed graph.
+
+    Parameters:
+    - graph (nx.DiGraph): The directed graph.
+
+    Returns:
+    - List[List[Tuple[str, str]]]: A list of linked lists, where each linked list is represented as a list of tuples containing the node id and name in the order of appearance.
+    """
+
+    tree = nx.reverse(graph, copy=True)
+
+    linked_lists = []
+    visited = set()
+
+    for node in tree.nodes:
+        if node not in visited:
+            linked_list = []
+            current = node
+
+            while current is not None:
+                linked_list.append((current, tree.nodes[current]["name"]))
+                visited.add(current)
+
+                successors = list(tree.successors(current))
+                if len(successors) == 1:
+                    current = successors[0]
+                else:
+                    current = None
+
+            linked_lists.append(linked_list)
+
+    return linked_lists
+
+
 def find_leaves(tree: nx.DiGraph, node: str) -> List[str]:
     """
     Recursively search for all leaves under a specific node in a tree.
