@@ -34,7 +34,9 @@ class Term:
         )
 
 
-def parse_obo(filename: str) -> Tuple[List[Term], List[Tuple[str, str]]]:
+def parse_obo(
+    filename: str,
+) -> Tuple[List[Term], List[Tuple[str, str]], List[Tuple[str, str]]]:
     """
     Parses an OBO file to collect terms and their properties.
 
@@ -42,12 +44,14 @@ def parse_obo(filename: str) -> Tuple[List[Term], List[Tuple[str, str]]]:
     - filename (str): Path to the OBO file.
 
     Returns:
-    - Tuple[List[Term], List[Tuple[str, str]]]: A tuple containing two items:
+    - Tuple[List[Term], List[Tuple[str, str]], List[Tuple[str, str]]]: A tuple containing three items:
         1. A list of Term objects.
-        2. A list of tuples representing relationships where each tuple contains a term ID and the ID it is part of.
+        2. A list of tuples representing part_of relationships where each tuple contains a term ID and the ID it is part of.
+        3. A list of tuples representing preceded_by relationships where each tuple contains a term ID and the ID it is preceded by.
     """
     terms = []
-    relationships = []
+    part_of = []
+    preceded_by = []
     in_term = False
     attributes = {}
 
@@ -73,13 +77,19 @@ def parse_obo(filename: str) -> Tuple[List[Term], List[Tuple[str, str]]]:
                 )
                 terms.append(term)
 
-                # Store part_of relationships separately as tuples
+                # Store part_of and preceded_by relationships separately as tuples
                 if (
                     "relationship" in attributes
                     and "part_of" in attributes["relationship"]
                 ):
                     for target_id in attributes["relationship"]["part_of"]:
-                        relationships.append((term.id, target_id))
+                        part_of.append((term.id, target_id))
+                if (
+                    "relationship" in attributes
+                    and "preceded_by" in attributes["relationship"]
+                ):
+                    for target_id in attributes["relationship"]["preceded_by"]:
+                        preceded_by.append((term.id, target_id))
 
                 in_term = False
                 attributes = {}
@@ -103,7 +113,7 @@ def parse_obo(filename: str) -> Tuple[List[Term], List[Tuple[str, str]]]:
                     else:
                         attributes[tag] = value
 
-    return terms, relationships
+    return terms, part_of, preceded_by
 
 
 def split_hierarchy(terms: List[Term]) -> Tuple[List[Term], List[Term], List[Term]]:
