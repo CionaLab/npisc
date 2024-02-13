@@ -403,6 +403,33 @@ def node_to_leaves(graph: nx.DiGraph) -> Dict[str, List[str]]:
     return node_to_leaves
 
 
+def group_leaves_by_time(
+    graph: nx.DiGraph, leaves: Dict[str, List[str]]
+) -> Dict[Tuple[str, str, str], List[str]]:
+    """
+    Groups the leaves in the given dictionary by their start and end nodes.
+
+    Parameters:
+    - graph (nx.DiGraph): The directed graph representing the ontology.
+    - leaves (Dict[str, List[str]]): A dictionary mapping each node to a list of its leaves.
+
+    Returns:
+    - Dict[Tuple[str, str, str], List[str]]: A dictionary with (id, start, end) as key and a list of leaf ids as value.
+    """
+
+    results = defaultdict(list)
+    starts = nx.get_node_attributes(graph, "start")
+    ends = nx.get_node_attributes(graph, "end")
+
+    for node, leaves in leaves.items():
+        for leaf in leaves:
+            start = starts.get(leaf)
+            end = ends.get(leaf)
+            results[(node, start, end)].append(leaf)
+
+    return results
+
+
 def get_node_name(graph: nx.DiGraph, node: str) -> Optional[str]:
     """
     Finds the name of a node in the graph based on its ID.
