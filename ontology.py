@@ -1,5 +1,4 @@
 from typing import List, Tuple, Optional, Dict, Callable
-import re
 from collections import defaultdict
 import csv
 import networkx as nx
@@ -381,7 +380,7 @@ def find_leaves(tree: nx.DiGraph, node: str) -> List[str]:
     return leaves
 
 
-def node_to_leaves(graph: nx.DiGraph, node_attr="name") -> Dict[str, List[str]]:
+def node_to_leaves(graph: nx.DiGraph) -> Dict[str, List[str]]:
     """
     Constructs a dictionary mapping from nodes to the list of leaves under them in the tree.
     Assumes that the graph represents a tree structure.
@@ -395,21 +394,27 @@ def node_to_leaves(graph: nx.DiGraph, node_attr="name") -> Dict[str, List[str]]:
     """
     # First, we reverse the graph to make it a tree (parent -> children).
     tree = nx.reverse(graph, copy=True)
-    # Compile regex pattern for efficiency and specificity
-    pattern = re.compile("^([ABab])(\d+)\.(\d+)")
 
     node_to_leaves = {}
     for node in tree.nodes:
-        node_name = tree.nodes[node].get(node_attr)
         leaves = find_leaves(tree, node)  # Find all leaves under this node.
-        leaves_names = [
-            name for leaf in leaves
-            if pattern.match(name := tree.nodes[leaf].get(node_attr))
-        ]  # Convert node IDs to names or use the node ID if name is not present.
-        if leaves_names:
-            node_to_leaves[node_name] = leaves_names
-
+        if leaves:
+            node_to_leaves[node] = leaves
     return node_to_leaves
+
+
+def get_node_name(graph: nx.DiGraph, node: str) -> Optional[str]:
+    """
+    Finds the name of a node in the graph based on its ID.
+
+    Parameters:
+    - graph (nx.DiGraph): The directed graph.
+    - node (str): The ID of the node to find.
+
+    Returns:
+    - Optional[str]: The name of the node if found, None otherwise.
+    """
+    return graph.nodes[node].get("name")
 
 
 def write_to_csv(data: Dict[str, List[str]], filename: str) -> None:
