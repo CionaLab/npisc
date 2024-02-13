@@ -307,6 +307,11 @@ def build_graph(filename: str) -> Tuple[nx.DiGraph, nx.DiGraph]:
 
     for term in cirobua_terms:
         G_cirobua.add_node(term.id, name=term.name)
+        try:
+            G_cirobua.nodes[term.id]["start"] = term.relationship.get("start")[0]
+            G_cirobua.nodes[term.id]["end"] = term.relationship.get("end")[0]
+        except (KeyError, TypeError):
+            pass
     for term in cirobud_terms:
         G_cirobud.add_node(term.id, name=term.name)
 
