@@ -2,24 +2,9 @@ import argparse
 import sys
 import time
 from typing import List, Tuple, Optional, Generator
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urljoin
 
-from lxml import etree
-import requests
-
-
-def get_base_url(url: str) -> str:
-    """
-    Extract the base URL from the given URL.
-
-    Args:
-    - url (str): The full URL from which to extract the base URL.
-
-    Returns:
-    - str: The base URL.
-    """
-    parsed_url = urlparse(url)
-    return f"{parsed_url.scheme}://{parsed_url.hostname}"
+from scraper import get_base_url, fetch_parse
 
 
 def scrape_page(url: str, verify_ssl: bool = True) -> Tuple[List[str], Optional[str]]:
@@ -33,14 +18,7 @@ def scrape_page(url: str, verify_ssl: bool = True) -> Tuple[List[str], Optional[
     Returns:
     - Tuple[List[str], Optional[str]]: A tuple containing a list of article links and the URL of the next page (if available).
     """
-    response = requests.get(url, verify=verify_ssl)
-    if response.status_code != 200:
-        raise Exception(
-            f"Failed to fetch URL. HTTP Status Code: {response.status_code}"
-        )
-
-    parser = etree.HTMLParser()
-    tree = etree.fromstring(response.content, parser)
+    tree = fetch_parse(url, verify_ssl)
 
     base_url = get_base_url(url)
 

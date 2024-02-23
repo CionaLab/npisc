@@ -4,23 +4,7 @@ import sys
 import time
 from typing import List, Tuple, Optional
 
-import requests
-from lxml import etree
-
-
-def extract_info(tree: etree._ElementTree, xpath: str) -> Optional[str]:
-    """
-    Helper function to extract information using a given XPath.
-
-    Args:
-    - tree (etree._ElementTree): The parsed HTML tree.
-    - xpath (str): The XPath to extract information.
-
-    Returns:
-    - Optional[str]: Extracted information or None if not found.
-    """
-    info = tree.xpath(xpath)
-    return info[0] if info else None
+from scraper import extract_info, fetch_parse
 
 
 def get_expression_info(
@@ -37,17 +21,12 @@ def get_expression_info(
     - Tuple[Optional[str], Optional[str], List[str]]: A tuple containing the stage, the predicted gene,
       and a list of territories  or None if not reported.
     """
-    response = requests.get(url, verify=verify_ssl)
-    if response.status_code != 200:
-        raise Exception(
-            f"Failed to fetch URL. HTTP Status Code: {response.status_code}"
-        )
-
-    parser = etree.HTMLParser()
-    tree = etree.fromstring(response.content, parser)
+    tree = fetch_parse(url, verify_ssl)
 
     # Extracting the information using the refactored function
-    stage = extract_info(tree, '//*[@id="informations"]/div[3]/div/div[2]/div[2]/p/text()')
+    stage = extract_info(
+        tree, '//*[@id="informations"]/div[3]/div/div[2]/div[2]/p/text()'
+    )
     territories = tree.xpath(
         '//*[@id="informations"]/div[3]/div/div[3]/div/div/table/tr/td[1]/a/text()'
     )
