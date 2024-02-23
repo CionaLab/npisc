@@ -10,6 +10,7 @@ from ontology import (
     get_node_name,
     group_leaves_by_time,
     get_linked_lists,
+    parse_url,
 )
 
 
@@ -68,15 +69,22 @@ def main():
                         if pattern_blast.match(name := get_node_name(g_territory, n))
                     ]
                 )
+    visited = set()
 
     with args.input as fr, args.output as fw:
         reader = csv.DictReader(fr, delimiter="\t")
         writer = csv.DictWriter(fw, fieldnames=reader.fieldnames + ["Territory_eq"])
         writer.writeheader()
         for row in reader:
-            stage = pattern_stages.match(row["Stage"]).group(0)
-            for t_eq in d3[DICT_ID_STAGES[stage]][row["Territory"]]:
-                writer.writerow({**row, "Territory_eq": t_eq})
+            params = parse_url(row["URL"])
+            territory = row["Territory"]
+            gene = row["Gene"]
+            stage = row["Stage"]
+            if (params["biomaterial_id"], stage, territory, gene) not in visited:
+                visited.add((params["biomaterial_id"], stage, territory, gene))
+                stage = pattern_stages.match(row["Stage"]).group(0)
+                for t_eq in d3[DICT_ID_STAGES[stage]][row["Territory"]]:
+                    writer.writerow({**row, "Territory_eq": t_eq})
 
 
 if __name__ == "__main__":

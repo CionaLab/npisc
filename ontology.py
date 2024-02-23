@@ -1,6 +1,8 @@
 from typing import List, Tuple, Optional, Dict, Callable
 from collections import defaultdict
 import csv
+from urllib.parse import urlparse, parse_qs
+
 import networkx as nx
 
 
@@ -307,6 +309,21 @@ def get_node_name(graph: nx.DiGraph, node: str) -> Optional[str]:
     - Optional[str]: The name of the node if found, None otherwise.
     """
     return graph.nodes[node].get("name")
+
+
+def parse_url(url: str) -> dict:
+    """
+    Parses the given URL and returns a dictionary of its parameters.
+
+    Parameters:
+    - url (str): The URL to parse.
+
+    Returns:
+    - dict: A dictionary containing the parsed parameters.
+    """
+    parsed_url = urlparse(url)
+    query_params = parse_qs(parsed_url.query)
+    return {key: value[0] for key, value in query_params.items()}
 
 
 def write_to_csv(data: Dict[str, List[str]], filename: str) -> None:
