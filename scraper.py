@@ -1,6 +1,7 @@
 from typing import List, Optional
 from urllib.parse import urlparse
 import hashlib
+import os
 import io
 import mimetypes
 
@@ -60,12 +61,15 @@ def extract_info(tree: etree._ElementTree, xpath: str) -> Optional[str]:
     return info[0] if info else None
 
 
-def download_file(url: str, verify_ssl: bool = True) -> str:
+def download_file(
+    url: str, path_prefix: str = "images", verify_ssl: bool = True
+) -> str:
     """
     Download a file from a URL, save it to a StringIO buffer, compute its sha512 value and use it as the filename.
 
     Args:
     - url (str): The URL of the file to download.
+    - path_prefix (str): The path prefix for the downloaded file.
     - verify_ssl (bool): Whether to verify SSL certificates.
 
     Returns:
@@ -92,8 +96,18 @@ def download_file(url: str, verify_ssl: bool = True) -> str:
     # Use the sha512 value as the filename and the extension from the MIME type
     filename_with_extension = f"{filename}{extension}"
 
+    # Add the path prefix to the filename
+    filename_with_path = (
+        os.path.join(path_prefix, filename_with_extension)
+        if path_prefix
+        else filename_with_extension
+    )
+
+    # Create directories in the path prefix if they do not exist
+    os.makedirs(os.path.dirname(filename_with_path), exist_ok=True)
+
     # Write the file to disk
-    with open(filename_with_extension, "wb") as f:
+    with open(filename_with_path, "wb") as f:
         f.write(buffer.getvalue())
 
-    return filename_with_extension
+    return filename_with_path

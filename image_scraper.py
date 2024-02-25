@@ -9,6 +9,7 @@ from scraper import fetch_parse, download_file, get_base_url
 
 XPATH_IMAGE = '//div[contains(@class, "content_yellow")]/div/div[@id="picture_description"]/div[contains(@class, "mini_picture")]/a/@href'
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Web Scraper for in situ images table."
@@ -42,6 +43,13 @@ def main():
         default=0.5,
         help="Duration to wait between requests in seconds. Default is 0.5 seconds.",
     )
+    parser.add_argument(
+        "--prefix",
+        "-p",
+        type=str,
+        default="images",
+        help="Prefix for the images path. Default is 'images'.",
+    )
 
     args = parser.parse_args()
 
@@ -53,11 +61,11 @@ def main():
         for line in input_file:
             url = line.strip()
 
-            tree = fetch_parse(url, False)
+            tree = fetch_parse(url, not args.insecure)
 
             for i in tree.xpath(XPATH_IMAGE):
                 url_image = urljoin(get_base_url(url), i)
-                file_image = download_file(url_image, False)
+                file_image = download_file(url_image, args.prefix, not args.insecure)
                 writer.writerow(
                     [
                         url,
