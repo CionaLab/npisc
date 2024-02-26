@@ -5,6 +5,8 @@ import time
 
 from urllib.parse import urljoin
 
+from requests import HTTPError
+
 from scraper import fetch_parse, download_file, get_base_url
 
 XPATH_IMAGE = '//div[contains(@class, "content_yellow")]/div/div[@id="picture_description"]/div[contains(@class, "mini_picture")]/a/@href'
@@ -64,15 +66,18 @@ def main():
             tree = fetch_parse(url, not args.insecure)
 
             for i in tree.xpath(XPATH_IMAGE):
-                url_image = urljoin(get_base_url(url), i)
-                file_image = download_file(url_image, args.prefix, not args.insecure)
-                writer.writerow(
-                    [
-                        url,
-                        url_image,
-                        file_image,
-                    ]
-                )
+                try:
+                    url_image = urljoin(get_base_url(url), i)
+                    file_image = download_file(url_image, args.prefix, not args.insecure)
+                    writer.writerow(
+                        [
+                            url,
+                            url_image,
+                            file_image,
+                        ]
+                    )
+                except HTTPError as e:
+                    print(f"Failed to download image from {url_image}: {e}", file=sys.stderr)
 
             time.sleep(args.sleep)
 

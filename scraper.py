@@ -9,6 +9,29 @@ import requests
 from lxml import etree
 
 
+def http_get(url: str, verify_ssl: bool = True) -> requests.Response:
+    """
+    Send a GET request to the specified URL and return the response.
+
+    Args:
+    - url (str): The URL to send the GET request to.
+    - verify_ssl (bool): Whether to verify SSL certificates.
+
+    Returns:
+    - requests.Response: The response from the GET request.
+    """
+    try:
+        response = requests.get(url, verify=verify_ssl)
+        response.raise_for_status()
+    except requests.HTTPError as e:
+        raise requests.HTTPError(f"{e} when trying to download {url}") from None
+    else:
+        if response.status_code != 200:
+            raise requests.HTTPError(f"Unexpected error when trying to download {url}")
+
+    return response
+
+
 def fetch_parse(url: str, verify_ssl: bool = True) -> etree._Element:
     """
     Fetch the content of the URL and parse it into an HTML tree.
@@ -20,12 +43,7 @@ def fetch_parse(url: str, verify_ssl: bool = True) -> etree._Element:
     Returns:
     - etree._Element: The parsed HTML tree.
     """
-    response = requests.get(url, verify=verify_ssl)
-    if response.status_code != 200:
-        raise Exception(
-            f"Failed to fetch URL. HTTP Status Code: {response.status_code}"
-        )
-
+    response = http_get(url, verify_ssl)
     parser = etree.HTMLParser()
     tree = etree.fromstring(response.content, parser)
 
@@ -75,11 +93,7 @@ def download_file(
     Returns:
     - str: The filename of the downloaded file.
     """
-    response = requests.get(url, verify=verify_ssl)
-    if response.status_code != 200:
-        raise Exception(
-            f"Failed to download file. HTTP Status Code: {response.status_code}"
-        )
+    response = http_get(url, verify_ssl)
 
     # Save the file to a StringIO buffer
     buffer = io.BytesIO(response.content)
