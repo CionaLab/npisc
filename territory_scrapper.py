@@ -25,13 +25,15 @@ def get_expression_info(
 
     # Extracting the information using the refactored function
     stage = extract_info(
-        tree, '//*[@id="informations"]/div[3]/div/div[2]/div[2]/p/text()'
+        tree,
+        '//section[@id="informations"]/div[@class="content_title"]/div[@class="content_yellow"]/div[@class="content_frame mod"]/div[2]/p/text()',
     )
     territories = tree.xpath(
-        '//*[@id="informations"]/div[3]/div/div[3]/div/div/table/tr/td[1]/a/text()'
+        '//section[@id="informations"]/div[@class="content_title"]/div[@class="content_yellow"]/div[@class="table"]/div[@class="results_yellow"]//div[@class="results_content"]/table/tr/td[1]/a/text()',
     )
     predicted_gene = extract_info(
-        tree, '//*[@id="informations"]/div[3]/div/div[2]/div[3]/p/a/text()'
+        tree,
+        '//section[@id="informations"]/div[@class="content_title"]/div[@class="content_yellow"]/div[@class="content_frame mod"]/div[3]/p/a/text()',
     )
 
     return stage, predicted_gene, territories
