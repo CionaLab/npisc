@@ -28,8 +28,14 @@ def get_expression_info(
         tree,
         '//section[@id="informations"]/div[@class="content_title"]/div[@class="content_yellow"]/div[@class="content_frame mod"]/div[2]/p/text()',
     )
-    territories = tree.xpath(
-        '//section[@id="informations"]/div[@class="content_title"]/div[@class="content_yellow"]/div[@class="table"]/div[@class="results_yellow"]//div[@class="results_content"]/table/tr/td[1]/a/text()',
+    territories = (
+        t
+        if (
+            t := tree.xpath(
+                '//section[@id="informations"]/div[@class="content_title"]/div[@class="content_yellow"]/div[@class="table"]/div[@class="results_yellow"]//div[@class="results_content"]/table/tr/td[1]/a/text()',
+            )
+        )
+        else ["None"]
     )
     predicted_gene = extract_info(
         tree,
