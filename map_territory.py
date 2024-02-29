@@ -13,6 +13,9 @@ from ontology import (
     parse_url,
 )
 
+PATTERN_STAGES = re.compile(r"^Stage \d+[a-z]?")
+PATTERN_BLAST = re.compile(r"^[AaBb]\d+\.\d+\*?$")
+
 
 def main():
     parser = argparse.ArgumentParser(description="Process ontology and tsv file.")
@@ -41,20 +44,17 @@ def main():
 
     g_territory, g_stage = build_graph(args.obo)
 
-    pattern_stages = re.compile(r"^Stage \d+[a-z]?")
     STAGES = [
         (i, j)
         for l in get_linked_lists(g_stage)
         for (i, j) in l
-        if pattern_stages.match(j)
-        if pattern_stages.match(j)
+        if PATTERN_STAGES.match(j)
+        if PATTERN_STAGES.match(j)
     ]
     DICT_STAGES = {k: i for i, (k, _) in enumerate(STAGES)}
     DICT_ID_STAGES = {v: i for i, (_, v) in enumerate(STAGES)}
 
     map_territory = group_leaves_by_time(g_territory, node_to_leaves(g_territory))
-
-    pattern_blast = re.compile(r"^[AaBb]\d+\.\d+\*?$")
 
     d3 = defaultdict(lambda: defaultdict(list))
     for (id, start, end), v in map_territory.items():
@@ -66,7 +66,7 @@ def main():
                     [
                         name
                         for n in v
-                        if pattern_blast.match(name := get_node_name(g_territory, n))
+                        if PATTERN_BLAST.match(name := get_node_name(g_territory, n))
                     ]
                 )
     visited = set()
@@ -82,7 +82,7 @@ def main():
             stage = row["Stage"]
             if (params["biomaterial_id"], stage, territory, gene) not in visited:
                 visited.add((params["biomaterial_id"], stage, territory, gene))
-                stage = pattern_stages.match(row["Stage"]).group(0)
+                stage = PATTERN_STAGES.match(row["Stage"]).group(0)
                 for t_eq in d3[DICT_ID_STAGES[stage]][row["Territory"]]:
                     writer.writerow({**row, "Territory_eq": t_eq})
 
