@@ -95,6 +95,11 @@ def parse_obo(
 
                 in_term = True
                 attributes = {}
+            elif line == "[Typedef]" or line == "[Instance]":
+                if in_term:
+                    clear_stack()
+                in_term = False
+                attributes = {}
             elif in_term:
                 # Split at the first occurrence of ":"
                 parts = line.split(":", 1)
@@ -115,7 +120,7 @@ def parse_obo(
                     else:
                         attributes[tag] = value
 
-    if not attributes:
+    if attributes:
         clear_stack()
 
     return (
