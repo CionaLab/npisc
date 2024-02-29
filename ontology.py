@@ -13,25 +13,25 @@ class Term:
         name: Optional[str] = None,
         namespace: Optional[str] = None,
         definition: Optional[str] = None,
-        is_a: Optional[str] = None,
+        is_a: Optional[List[str]] = None,
         relationship: Optional[Dict[str, List[str]]] = None,
-        synonyms: Optional[List[str]] = None,
+        synonym: Optional[List[str]] = None,
         references: Optional[List[str]] = None,
     ):
         self.id = id
         self.name = name
         self.namespace = namespace
         self.definition = definition
-        self.is_a = is_a
+        self.is_a = is_a or []
         self.relationship = relationship or {}
-        self.synonyms = synonyms or []
+        self.synonym = synonym or []
         self.references = references or []
 
     def __repr__(self):
         return (
             f"Term(id={self.id!r}, name={self.name!r}, namespace={self.namespace!r}, "
             f"definition={self.definition!r}, is_a={self.is_a!r}, "
-            f"relationship={self.relationship!r}, synonyms={self.synonyms!r}, "
+            f"relationship={self.relationship!r}, synonym={self.synonym!r}, "
             f"references={self.references!r})"
         )
 
@@ -74,7 +74,7 @@ def parse_obo(
             definition=attributes.get("def"),
             is_a=attributes.get("is_a"),
             relationship=attributes.get("relationship"),
-            synonyms=attributes.get("synonym"),
+            synonym=attributes.get("synonym"),
             references=attributes.get("reference"),
         )
         terms.append(term)
@@ -110,13 +110,15 @@ def parse_obo(
                     # Store relationships in a dictionary
                     if tag == "relationship":
                         rel_type, rel_value = value.split(" ", 1)
-                        attributes.setdefault("relationship", {}).setdefault(
+                        attributes.setdefault(tag, {}).setdefault(
                             rel_type.strip(), []
                         ).append(rel_value.strip())
                     elif tag == "synonym":
-                        attributes.setdefault("synonym", []).append(value)
+                        attributes.setdefault(tag, []).append(value)
+                    elif tag == "is_a":
+                        attributes.setdefault(tag, []).append(value)
                     elif tag == "reference":
-                        attributes.setdefault("reference", []).append(value)
+                        attributes.setdefault(tag, []).append(value)
                     else:
                         attributes[tag] = value
 
@@ -185,6 +187,11 @@ def build_graph(filename: str) -> Tuple[nx.DiGraph, nx.DiGraph]:
             pass
     for term in cirobud_terms:
         G_cirobud.add_node(term.id, name=term.name)
+        try:
+            synonym = term.synonym[0].split('"')[1]
+            G_cirobud.nodes[term.id]["synonym"] = synonym
+        except (IndexError):
+            pass
 
     for source, target in part_of:
         G_cirobua.add_edge(source, target, relationship="part_of")
