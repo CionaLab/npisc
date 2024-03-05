@@ -39,11 +39,18 @@ with open('stages.tsv', 'w') as f:
 
 # %%
 
+# Find the root node
+root_node = [n for n, d in g_territory.out_degree() if d==0]
+
 with open('territories.tsv', 'w') as f:
     writer = csv.writer(f, delimiter='\t')
     writer.writerow(['Term', 'Name'])
-    for i in g_territory.nodes.data("name"):
-        writer.writerow(i)
+    for r in root_node:
+        t = bfs_tree(g_territory, r, reverse=True)
+
+        # Print the tree breadth first
+        for node in t:
+            writer.writerow((node, g_territory.nodes[node]["name"],))
 
 # %%
 STAGES
