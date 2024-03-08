@@ -73,18 +73,19 @@ def main():
 
     with args.input as fr, args.output as fw:
         reader = csv.DictReader(fr, delimiter="\t")
-        writer = csv.DictWriter(fw, fieldnames=reader.fieldnames + ["Territory_eq"])
+        writer = csv.DictWriter(
+            fw, fieldnames=reader.fieldnames + ["Territory_eq"], delimiter="\t"
+        )
         writer.writeheader()
         for row in reader:
-            params = parse_url(row["URL"])
-            territory = row["Territory"]
-            gene = row["Gene"]
-            stage = row["Stage"]
-            if (params["biomaterial_id"], stage, territory, gene) not in visited:
-                visited.add((params["biomaterial_id"], stage, territory, gene))
-                stage = PATTERN_STAGES.match(row["Stage"]).group(0)
-                for t_eq in d3[DICT_ID_STAGES[stage]][row["Territory"]]:
-                    writer.writerow({**row, "Territory_eq": t_eq})
+            if all(((s := row["Stage"]) != "None", (g := row["Gene"]) != "None")):
+                params = parse_url(row["URL"])
+                territory = row["Territory"]
+                if (params["biomaterial_id"], s, territory, g) not in visited:
+                    visited.add((params["biomaterial_id"], s, territory, g))
+                    stage = PATTERN_STAGES.match(s).group(0)
+                    for t_eq in d3[DICT_ID_STAGES[stage]][row["Territory"]]:
+                        writer.writerow({**row, "Territory_eq": t_eq})
 
 
 if __name__ == "__main__":
