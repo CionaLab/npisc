@@ -5,40 +5,6 @@
                 "coordinates": [
                     [
                         [
-                            1,
-                            0
-                        ],
-                        [
-                            1,
-                            1
-                        ],
-                        [
-                            2,
-                            1
-                        ],
-                        [
-                            2,
-                            0
-                        ],
-                        [
-                            1,
-                            0
-                        ]
-                    ]
-                ],
-                "type": "Polygon"
-            },
-            "id": 0,
-            "properties": {
-                "name": "A9.31"
-            },
-            "type": "Feature"
-        },
-        {
-            "geometry": {
-                "coordinates": [
-                    [
-                        [
                             2,
                             0
                         ],
@@ -243,40 +209,6 @@
                 "coordinates": [
                     [
                         [
-                            8,
-                            0
-                        ],
-                        [
-                            8,
-                            1
-                        ],
-                        [
-                            9,
-                            1
-                        ],
-                        [
-                            9,
-                            0
-                        ],
-                        [
-                            8,
-                            0
-                        ]
-                    ]
-                ],
-                "type": "Polygon"
-            },
-            "id": 7,
-            "properties": {
-                "name": "A9.31*"
-            },
-            "type": "Feature"
-        },
-        {
-            "geometry": {
-                "coordinates": [
-                    [
-                        [
                             0,
                             1
                         ],
@@ -302,7 +234,7 @@
             },
             "id": 8,
             "properties": {
-                "name": "b10.74"
+                "name": "b9.33"
             },
             "type": "Feature"
         },
@@ -608,7 +540,7 @@
             },
             "id": 17,
             "properties": {
-                "name": "b10.74*"
+                "name": "b9.33*"
             },
             "type": "Feature"
         },
@@ -642,7 +574,7 @@
             },
             "id": 18,
             "properties": {
-                "name": "b10.75"
+                "name": "b9.37"
             },
             "type": "Feature"
         },
@@ -880,7 +812,7 @@
             },
             "id": 25,
             "properties": {
-                "name": "b10.75*"
+                "name": "b9.37*"
             },
             "type": "Feature"
         },
@@ -914,7 +846,7 @@
             },
             "id": 26,
             "properties": {
-                "name": "b10.76"
+                "name": "b9.38"
             },
             "type": "Feature"
         },
@@ -1152,7 +1084,7 @@
             },
             "id": 33,
             "properties": {
-                "name": "b10.76*"
+                "name": "b9.38*"
             },
             "type": "Feature"
         },
