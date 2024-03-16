@@ -166,7 +166,7 @@
             },
             "id": 4,
             "properties": {
-                "name": "A9.13"
+                "name": "A9.13*"
             },
             "type": "Feature"
         },
@@ -200,7 +200,7 @@
             },
             "id": 5,
             "properties": {
-                "name": "A9.15"
+                "name": "A9.15*"
             },
             "type": "Feature"
         },
@@ -234,7 +234,7 @@
             },
             "id": 6,
             "properties": {
-                "name": "A9.29"
+                "name": "A9.29*"
             },
             "type": "Feature"
         },
@@ -268,7 +268,7 @@
             },
             "id": 7,
             "properties": {
-                "name": "A9.31"
+                "name": "A9.31*"
             },
             "type": "Feature"
         },
@@ -472,7 +472,7 @@
             },
             "id": 13,
             "properties": {
-                "name": "A9.14"
+                "name": "A9.14*"
             },
             "type": "Feature"
         },
@@ -506,7 +506,7 @@
             },
             "id": 14,
             "properties": {
-                "name": "A9.16"
+                "name": "A9.16*"
             },
             "type": "Feature"
         },
@@ -540,7 +540,7 @@
             },
             "id": 15,
             "properties": {
-                "name": "A9.30"
+                "name": "A9.30*"
             },
             "type": "Feature"
         },
@@ -574,7 +574,7 @@
             },
             "id": 16,
             "properties": {
-                "name": "A9.32"
+                "name": "A9.32*"
             },
             "type": "Feature"
         },
@@ -608,7 +608,7 @@
             },
             "id": 17,
             "properties": {
-                "name": "b10.74"
+                "name": "b10.74*"
             },
             "type": "Feature"
         },
@@ -778,7 +778,7 @@
             },
             "id": 22,
             "properties": {
-                "name": "a9.37"
+                "name": "a9.37*"
             },
             "type": "Feature"
         },
@@ -812,7 +812,7 @@
             },
             "id": 23,
             "properties": {
-                "name": "a9.33"
+                "name": "a9.33*"
             },
             "type": "Feature"
         },
@@ -846,7 +846,7 @@
             },
             "id": 24,
             "properties": {
-                "name": "a9.49"
+                "name": "a9.49*"
             },
             "type": "Feature"
         },
@@ -880,7 +880,7 @@
             },
             "id": 25,
             "properties": {
-                "name": "b10.75"
+                "name": "b10.75*"
             },
             "type": "Feature"
         },
@@ -1050,7 +1050,7 @@
             },
             "id": 30,
             "properties": {
-                "name": "a9.38"
+                "name": "a9.38*"
             },
             "type": "Feature"
         },
@@ -1084,7 +1084,7 @@
             },
             "id": 31,
             "properties": {
-                "name": "a9.34"
+                "name": "a9.34*"
             },
             "type": "Feature"
         },
@@ -1118,7 +1118,7 @@
             },
             "id": 32,
             "properties": {
-                "name": "a9.50"
+                "name": "a9.50*"
             },
             "type": "Feature"
         },
@@ -1152,7 +1152,7 @@
             },
             "id": 33,
             "properties": {
-                "name": "b10.76"
+                "name": "b10.76*"
             },
             "type": "Feature"
         },
@@ -1288,7 +1288,7 @@
             },
             "id": 37,
             "properties": {
-                "name": "a9.39"
+                "name": "a9.39*"
             },
             "type": "Feature"
         },
@@ -1322,7 +1322,7 @@
             },
             "id": 38,
             "properties": {
-                "name": "a9.35"
+                "name": "a9.35*"
             },
             "type": "Feature"
         },
@@ -1356,7 +1356,7 @@
             },
             "id": 39,
             "properties": {
-                "name": "a9.51"
+                "name": "a9.51*"
             },
             "type": "Feature"
         },
@@ -1492,7 +1492,7 @@
             },
             "id": 43,
             "properties": {
-                "name": "a9.40"
+                "name": "a9.40*"
             },
             "type": "Feature"
         },
@@ -1526,7 +1526,7 @@
             },
             "id": 44,
             "properties": {
-                "name": "a9.36"
+                "name": "a9.36*"
             },
             "type": "Feature"
         },
@@ -1560,7 +1560,7 @@
             },
             "id": 45,
             "properties": {
-                "name": "a9.52"
+                "name": "a9.52*"
             },
             "type": "Feature"
         }
