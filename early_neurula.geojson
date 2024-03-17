@@ -1,0 +1,2249 @@
+{
+    "features": [
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            2,
+                            0
+                        ],
+                        [
+                            2,
+                            1
+                        ],
+                        [
+                            3,
+                            1
+                        ],
+                        [
+                            3,
+                            0
+                        ],
+                        [
+                            2,
+                            0
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 1,
+            "properties": {
+                "name": "A10.57"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            3,
+                            0
+                        ],
+                        [
+                            3,
+                            1
+                        ],
+                        [
+                            4,
+                            1
+                        ],
+                        [
+                            4,
+                            0
+                        ],
+                        [
+                            3,
+                            0
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 2,
+            "properties": {
+                "name": "A10.29"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            4,
+                            0
+                        ],
+                        [
+                            4,
+                            1
+                        ],
+                        [
+                            5,
+                            1
+                        ],
+                        [
+                            5,
+                            0
+                        ],
+                        [
+                            4,
+                            0
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 3,
+            "properties": {
+                "name": "A10.25"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            5,
+                            0
+                        ],
+                        [
+                            5,
+                            1
+                        ],
+                        [
+                            6,
+                            1
+                        ],
+                        [
+                            6,
+                            0
+                        ],
+                        [
+                            5,
+                            0
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 4,
+            "properties": {
+                "name": "A10.25*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            6,
+                            0
+                        ],
+                        [
+                            6,
+                            1
+                        ],
+                        [
+                            7,
+                            1
+                        ],
+                        [
+                            7,
+                            0
+                        ],
+                        [
+                            6,
+                            0
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 5,
+            "properties": {
+                "name": "A10.29*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            7,
+                            0
+                        ],
+                        [
+                            7,
+                            1
+                        ],
+                        [
+                            8,
+                            1
+                        ],
+                        [
+                            8,
+                            0
+                        ],
+                        [
+                            7,
+                            0
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 6,
+            "properties": {
+                "name": "A10.57*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            2,
+                            1
+                        ],
+                        [
+                            2,
+                            2
+                        ],
+                        [
+                            3,
+                            2
+                        ],
+                        [
+                            3,
+                            1
+                        ],
+                        [
+                            2,
+                            1
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 9,
+            "properties": {
+                "name": "A10.58"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            3,
+                            1
+                        ],
+                        [
+                            3,
+                            2
+                        ],
+                        [
+                            4,
+                            2
+                        ],
+                        [
+                            4,
+                            1
+                        ],
+                        [
+                            3,
+                            1
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 10,
+            "properties": {
+                "name": "A10.30"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            4,
+                            1
+                        ],
+                        [
+                            4,
+                            2
+                        ],
+                        [
+                            5,
+                            2
+                        ],
+                        [
+                            5,
+                            1
+                        ],
+                        [
+                            4,
+                            1
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 11,
+            "properties": {
+                "name": "A10.26"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            5,
+                            1
+                        ],
+                        [
+                            5,
+                            2
+                        ],
+                        [
+                            6,
+                            2
+                        ],
+                        [
+                            6,
+                            1
+                        ],
+                        [
+                            5,
+                            1
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 12,
+            "properties": {
+                "name": "A10.26*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            6,
+                            1
+                        ],
+                        [
+                            6,
+                            2
+                        ],
+                        [
+                            7,
+                            2
+                        ],
+                        [
+                            7,
+                            1
+                        ],
+                        [
+                            6,
+                            1
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 13,
+            "properties": {
+                "name": "A10.30*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            7,
+                            1
+                        ],
+                        [
+                            7,
+                            2
+                        ],
+                        [
+                            8,
+                            2
+                        ],
+                        [
+                            8,
+                            1
+                        ],
+                        [
+                            7,
+                            1
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 14,
+            "properties": {
+                "name": "A10.58*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            1,
+                            2
+                        ],
+                        [
+                            1,
+                            3
+                        ],
+                        [
+                            2,
+                            3
+                        ],
+                        [
+                            2,
+                            2
+                        ],
+                        [
+                            1,
+                            2
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 12,
+            "properties": {
+                "name": "A10.63"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            2,
+                            2
+                        ],
+                        [
+                            2,
+                            3
+                        ],
+                        [
+                            3,
+                            3
+                        ],
+                        [
+                            3,
+                            2
+                        ],
+                        [
+                            2,
+                            2
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 18,
+            "properties": {
+                "name": "A10.59"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            3,
+                            2
+                        ],
+                        [
+                            3,
+                            3
+                        ],
+                        [
+                            4,
+                            3
+                        ],
+                        [
+                            4,
+                            2
+                        ],
+                        [
+                            3,
+                            2
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 14,
+            "properties": {
+                "name": "A10.31"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            4,
+                            2
+                        ],
+                        [
+                            4,
+                            3
+                        ],
+                        [
+                            5,
+                            3
+                        ],
+                        [
+                            5,
+                            2
+                        ],
+                        [
+                            4,
+                            2
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 15,
+            "properties": {
+                "name": "A10.27"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            5,
+                            2
+                        ],
+                        [
+                            5,
+                            3
+                        ],
+                        [
+                            6,
+                            3
+                        ],
+                        [
+                            6,
+                            2
+                        ],
+                        [
+                            5,
+                            2
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 16,
+            "properties": {
+                "name": "A10.27*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            6,
+                            2
+                        ],
+                        [
+                            6,
+                            3
+                        ],
+                        [
+                            7,
+                            3
+                        ],
+                        [
+                            7,
+                            2
+                        ],
+                        [
+                            6,
+                            2
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 22,
+            "properties": {
+                "name": "A10.31*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            7,
+                            2
+                        ],
+                        [
+                            7,
+                            3
+                        ],
+                        [
+                            8,
+                            3
+                        ],
+                        [
+                            8,
+                            2
+                        ],
+                        [
+                            7,
+                            2
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 23,
+            "properties": {
+                "name": "A10.59*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            8,
+                            2
+                        ],
+                        [
+                            8,
+                            3
+                        ],
+                        [
+                            9,
+                            3
+                        ],
+                        [
+                            9,
+                            2
+                        ],
+                        [
+                            8,
+                            2
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 19,
+            "properties": {
+                "name": "A10.63*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            0,
+                            3
+                        ],
+                        [
+                            0,
+                            4
+                        ],
+                        [
+                            1,
+                            4
+                        ],
+                        [
+                            1,
+                            3
+                        ],
+                        [
+                            0,
+                            3
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 23,
+            "properties": {
+                "name": "b9.33"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            1,
+                            3
+                        ],
+                        [
+                            1,
+                            4
+                        ],
+                        [
+                            2,
+                            4
+                        ],
+                        [
+                            2,
+                            3
+                        ],
+                        [
+                            1,
+                            3
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 21,
+            "properties": {
+                "name": "A10.64"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            2,
+                            3
+                        ],
+                        [
+                            2,
+                            4
+                        ],
+                        [
+                            3,
+                            4
+                        ],
+                        [
+                            3,
+                            3
+                        ],
+                        [
+                            2,
+                            3
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 22,
+            "properties": {
+                "name": "A10.60"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            3,
+                            3
+                        ],
+                        [
+                            3,
+                            4
+                        ],
+                        [
+                            4,
+                            4
+                        ],
+                        [
+                            4,
+                            3
+                        ],
+                        [
+                            3,
+                            3
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 23,
+            "properties": {
+                "name": "A10.32"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            4,
+                            3
+                        ],
+                        [
+                            4,
+                            4
+                        ],
+                        [
+                            5,
+                            4
+                        ],
+                        [
+                            5,
+                            3
+                        ],
+                        [
+                            4,
+                            3
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 24,
+            "properties": {
+                "name": "A10.28"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            5,
+                            3
+                        ],
+                        [
+                            5,
+                            4
+                        ],
+                        [
+                            6,
+                            4
+                        ],
+                        [
+                            6,
+                            3
+                        ],
+                        [
+                            5,
+                            3
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 25,
+            "properties": {
+                "name": "A10.28*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            6,
+                            3
+                        ],
+                        [
+                            6,
+                            4
+                        ],
+                        [
+                            7,
+                            4
+                        ],
+                        [
+                            7,
+                            3
+                        ],
+                        [
+                            6,
+                            3
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 26,
+            "properties": {
+                "name": "A10.32*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            7,
+                            3
+                        ],
+                        [
+                            7,
+                            4
+                        ],
+                        [
+                            8,
+                            4
+                        ],
+                        [
+                            8,
+                            3
+                        ],
+                        [
+                            7,
+                            3
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 27,
+            "properties": {
+                "name": "A10.60*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            8,
+                            3
+                        ],
+                        [
+                            8,
+                            4
+                        ],
+                        [
+                            9,
+                            4
+                        ],
+                        [
+                            9,
+                            3
+                        ],
+                        [
+                            8,
+                            3
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 28,
+            "properties": {
+                "name": "A10.64*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            9,
+                            3
+                        ],
+                        [
+                            9,
+                            4
+                        ],
+                        [
+                            10,
+                            4
+                        ],
+                        [
+                            10,
+                            3
+                        ],
+                        [
+                            9,
+                            3
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 29,
+            "properties": {
+                "name": "b9.33*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            0,
+                            4
+                        ],
+                        [
+                            0,
+                            5
+                        ],
+                        [
+                            1,
+                            5
+                        ],
+                        [
+                            1,
+                            4
+                        ],
+                        [
+                            0,
+                            4
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 30,
+            "properties": {
+                "name": "b9.37"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            3,
+                            4
+                        ],
+                        [
+                            3,
+                            5
+                        ],
+                        [
+                            4,
+                            5
+                        ],
+                        [
+                            4,
+                            4
+                        ],
+                        [
+                            3,
+                            4
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 31,
+            "properties": {
+                "name": "a10.65"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            4,
+                            4
+                        ],
+                        [
+                            4,
+                            5
+                        ],
+                        [
+                            5,
+                            5
+                        ],
+                        [
+                            5,
+                            4
+                        ],
+                        [
+                            4,
+                            4
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 32,
+            "properties": {
+                "name": "a10.73"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            5,
+                            4
+                        ],
+                        [
+                            5,
+                            5
+                        ],
+                        [
+                            6,
+                            5
+                        ],
+                        [
+                            6,
+                            4
+                        ],
+                        [
+                            5,
+                            4
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 33,
+            "properties": {
+                "name": "a10.73*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            6,
+                            4
+                        ],
+                        [
+                            6,
+                            5
+                        ],
+                        [
+                            7,
+                            5
+                        ],
+                        [
+                            7,
+                            4
+                        ],
+                        [
+                            6,
+                            4
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 34,
+            "properties": {
+                "name": "a10.65*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            9,
+                            4
+                        ],
+                        [
+                            9,
+                            5
+                        ],
+                        [
+                            10,
+                            5
+                        ],
+                        [
+                            10,
+                            4
+                        ],
+                        [
+                            9,
+                            4
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 35,
+            "properties": {
+                "name": "b9.37*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            0,
+                            5
+                        ],
+                        [
+                            0,
+                            6
+                        ],
+                        [
+                            1,
+                            6
+                        ],
+                        [
+                            1,
+                            5
+                        ],
+                        [
+                            0,
+                            5
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 40,
+            "properties": {
+                "name": "b9.38"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            2,
+                            5
+                        ],
+                        [
+                            2,
+                            6
+                        ],
+                        [
+                            3,
+                            6
+                        ],
+                        [
+                            3,
+                            5
+                        ],
+                        [
+                            2,
+                            5
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 37,
+            "properties": {
+                "name": "a9.49"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            3,
+                            5
+                        ],
+                        [
+                            3,
+                            6
+                        ],
+                        [
+                            4,
+                            6
+                        ],
+                        [
+                            4,
+                            5
+                        ],
+                        [
+                            3,
+                            5
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 38,
+            "properties": {
+                "name": "a10.66"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            4,
+                            5
+                        ],
+                        [
+                            4,
+                            6
+                        ],
+                        [
+                            5,
+                            6
+                        ],
+                        [
+                            5,
+                            5
+                        ],
+                        [
+                            4,
+                            5
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 39,
+            "properties": {
+                "name": "a10.74"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            5,
+                            5
+                        ],
+                        [
+                            5,
+                            6
+                        ],
+                        [
+                            6,
+                            6
+                        ],
+                        [
+                            6,
+                            5
+                        ],
+                        [
+                            5,
+                            5
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 40,
+            "properties": {
+                "name": "a10.74*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            6,
+                            5
+                        ],
+                        [
+                            6,
+                            6
+                        ],
+                        [
+                            7,
+                            6
+                        ],
+                        [
+                            7,
+                            5
+                        ],
+                        [
+                            6,
+                            5
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 41,
+            "properties": {
+                "name": "a10.66*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            7,
+                            5
+                        ],
+                        [
+                            7,
+                            6
+                        ],
+                        [
+                            8,
+                            6
+                        ],
+                        [
+                            8,
+                            5
+                        ],
+                        [
+                            7,
+                            5
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 42,
+            "properties": {
+                "name": "a9.49*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            9,
+                            5
+                        ],
+                        [
+                            9,
+                            6
+                        ],
+                        [
+                            10,
+                            6
+                        ],
+                        [
+                            10,
+                            5
+                        ],
+                        [
+                            9,
+                            5
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 43,
+            "properties": {
+                "name": "b9.38*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            2,
+                            6
+                        ],
+                        [
+                            2,
+                            7
+                        ],
+                        [
+                            3,
+                            7
+                        ],
+                        [
+                            3,
+                            6
+                        ],
+                        [
+                            2,
+                            6
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 44,
+            "properties": {
+                "name": "a9.50"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            3,
+                            6
+                        ],
+                        [
+                            3,
+                            7
+                        ],
+                        [
+                            4,
+                            7
+                        ],
+                        [
+                            4,
+                            6
+                        ],
+                        [
+                            3,
+                            6
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 45,
+            "properties": {
+                "name": "a9.34"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            4,
+                            6
+                        ],
+                        [
+                            4,
+                            7
+                        ],
+                        [
+                            5,
+                            7
+                        ],
+                        [
+                            5,
+                            6
+                        ],
+                        [
+                            4,
+                            6
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 46,
+            "properties": {
+                "name": "a9.38"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            5,
+                            6
+                        ],
+                        [
+                            5,
+                            7
+                        ],
+                        [
+                            6,
+                            7
+                        ],
+                        [
+                            6,
+                            6
+                        ],
+                        [
+                            5,
+                            6
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 47,
+            "properties": {
+                "name": "a9.38*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            6,
+                            6
+                        ],
+                        [
+                            6,
+                            7
+                        ],
+                        [
+                            7,
+                            7
+                        ],
+                        [
+                            7,
+                            6
+                        ],
+                        [
+                            6,
+                            6
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 48,
+            "properties": {
+                "name": "a9.34*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            7,
+                            6
+                        ],
+                        [
+                            7,
+                            7
+                        ],
+                        [
+                            8,
+                            7
+                        ],
+                        [
+                            8,
+                            6
+                        ],
+                        [
+                            7,
+                            6
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 49,
+            "properties": {
+                "name": "a9.50*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            3,
+                            7
+                        ],
+                        [
+                            3,
+                            8
+                        ],
+                        [
+                            4,
+                            8
+                        ],
+                        [
+                            4,
+                            7
+                        ],
+                        [
+                            3,
+                            7
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 50,
+            "properties": {
+                "name": "a10.69"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            4,
+                            7
+                        ],
+                        [
+                            4,
+                            8
+                        ],
+                        [
+                            5,
+                            8
+                        ],
+                        [
+                            5,
+                            7
+                        ],
+                        [
+                            4,
+                            7
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 51,
+            "properties": {
+                "name": "a10.77"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            5,
+                            7
+                        ],
+                        [
+                            5,
+                            8
+                        ],
+                        [
+                            6,
+                            8
+                        ],
+                        [
+                            6,
+                            7
+                        ],
+                        [
+                            5,
+                            7
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 52,
+            "properties": {
+                "name": "a10.77*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            6,
+                            7
+                        ],
+                        [
+                            6,
+                            8
+                        ],
+                        [
+                            7,
+                            8
+                        ],
+                        [
+                            7,
+                            7
+                        ],
+                        [
+                            6,
+                            7
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 53,
+            "properties": {
+                "name": "a10.69*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            2,
+                            8
+                        ],
+                        [
+                            2,
+                            9
+                        ],
+                        [
+                            3,
+                            9
+                        ],
+                        [
+                            3,
+                            8
+                        ],
+                        [
+                            2,
+                            8
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 54,
+            "properties": {
+                "name": "a9.51"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            3,
+                            8
+                        ],
+                        [
+                            3,
+                            9
+                        ],
+                        [
+                            4,
+                            9
+                        ],
+                        [
+                            4,
+                            8
+                        ],
+                        [
+                            3,
+                            8
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 55,
+            "properties": {
+                "name": "a10.70"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            4,
+                            8
+                        ],
+                        [
+                            4,
+                            9
+                        ],
+                        [
+                            5,
+                            9
+                        ],
+                        [
+                            5,
+                            8
+                        ],
+                        [
+                            4,
+                            8
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 56,
+            "properties": {
+                "name": "a10.78"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            5,
+                            8
+                        ],
+                        [
+                            5,
+                            9
+                        ],
+                        [
+                            6,
+                            9
+                        ],
+                        [
+                            6,
+                            8
+                        ],
+                        [
+                            5,
+                            8
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 57,
+            "properties": {
+                "name": "a10.78*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            6,
+                            8
+                        ],
+                        [
+                            6,
+                            9
+                        ],
+                        [
+                            7,
+                            9
+                        ],
+                        [
+                            7,
+                            8
+                        ],
+                        [
+                            6,
+                            8
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 58,
+            "properties": {
+                "name": "a10.70*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            7,
+                            8
+                        ],
+                        [
+                            7,
+                            9
+                        ],
+                        [
+                            8,
+                            9
+                        ],
+                        [
+                            8,
+                            8
+                        ],
+                        [
+                            7,
+                            8
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 59,
+            "properties": {
+                "name": "a9.51*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            2,
+                            9
+                        ],
+                        [
+                            2,
+                            10
+                        ],
+                        [
+                            3,
+                            10
+                        ],
+                        [
+                            3,
+                            9
+                        ],
+                        [
+                            2,
+                            9
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 63,
+            "properties": {
+                "name": "a9.52"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            3,
+                            9
+                        ],
+                        [
+                            3,
+                            10
+                        ],
+                        [
+                            4,
+                            10
+                        ],
+                        [
+                            4,
+                            9
+                        ],
+                        [
+                            3,
+                            9
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 61,
+            "properties": {
+                "name": "a9.36"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            4,
+                            9
+                        ],
+                        [
+                            4,
+                            10
+                        ],
+                        [
+                            5,
+                            10
+                        ],
+                        [
+                            5,
+                            9
+                        ],
+                        [
+                            4,
+                            9
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 62,
+            "properties": {
+                "name": "a9.40"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            5,
+                            9
+                        ],
+                        [
+                            5,
+                            10
+                        ],
+                        [
+                            6,
+                            10
+                        ],
+                        [
+                            6,
+                            9
+                        ],
+                        [
+                            5,
+                            9
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 63,
+            "properties": {
+                "name": "a9.40*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            6,
+                            9
+                        ],
+                        [
+                            6,
+                            10
+                        ],
+                        [
+                            7,
+                            10
+                        ],
+                        [
+                            7,
+                            9
+                        ],
+                        [
+                            6,
+                            9
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 64,
+            "properties": {
+                "name": "a9.36*"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            7,
+                            9
+                        ],
+                        [
+                            7,
+                            10
+                        ],
+                        [
+                            8,
+                            10
+                        ],
+                        [
+                            8,
+                            9
+                        ],
+                        [
+                            7,
+                            9
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": 65,
+            "properties": {
+                "name": "a9.52*"
+            },
+            "type": "Feature"
+        }
+    ],
+    "type": "FeatureCollection"
+}
