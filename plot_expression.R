@@ -1,5 +1,7 @@
 library(tidyverse)
 library(geojsonio)
+library(infotheo)
+library(ggdendro)
 
 # Renaming function
 f_rename <- function(.data) {
@@ -70,8 +72,18 @@ map(stages, function(stage_name) {
       legend.position = "none"
     )
 
-
   ggsave(paste0("matrix_", file_stage, ".png"))
+
+  m1 <- df %>%
+    group_by(gene, territory) %>%
+    count() %>%
+    pivot_wider(names_from = territory, values_from = n, values_fill = 0) %>%
+    column_to_rownames(var = "gene") %>%
+    mutinformation(method = "emp")
+
+  den1 <- as.dendrogram(hclust(d = dist(x = m1)))
+  plot <- ggdendrogram(data = den1, rotate = TRUE)
+  ggsave(paste0("dendrogram_", file_stage, ".png"))
 })
 
 # Use map to iterate over stages
@@ -125,6 +137,16 @@ map(stages, function(stage_name) {
       legend.position = "none"
     )
 
-
   ggsave(paste0("matrix_", file_stage, ".png"))
+
+  m1 <- df %>%
+    group_by(gene, territory_eq) %>%
+    count() %>%
+    pivot_wider(names_from = territory_eq, values_from = n, values_fill = 0) %>%
+    column_to_rownames(var = "gene") %>%
+    mutinformation(method = "emp")
+
+  den1 <- as.dendrogram(hclust(d = dist(x = m1)))
+  plot <- ggdendrogram(data = den1, rotate = TRUE)
+  ggsave(paste0("dendrogram_", file_stage, ".png"))
 })
