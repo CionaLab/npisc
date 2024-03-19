@@ -84,6 +84,24 @@ map(stages, function(stage_name) {
   den1 <- as.dendrogram(hclust(d = dist(x = m1)))
   plot <- ggdendrogram(data = den1, rotate = TRUE)
   ggsave(paste0("dendrogram_", file_stage, ".png"))
+
+  df1 <- as.table(m1) %>%
+    as.data.frame() %>%
+    as_tibble()
+
+  plot <- ggplot(df1, aes(x = Var1, y = Var2)) +
+    geom_tile(aes(fill = Freq)) +
+    scale_fill_gradient2() +
+    scale_x_discrete(drop = FALSE) +
+    scale_y_discrete(drop = FALSE, limits = rev) +
+    theme(
+      # Rotate the x-axis lables so they are legible
+      axis.text.x = element_text(angle = 270, hjust = 0),
+      # Force the plot into a square aspect ratio
+      aspect.ratio = 1,
+    )
+
+  ggsave(paste0("mi_", file_stage, ".png"))
 })
 
 # Use map to iterate over stages
@@ -149,4 +167,22 @@ map(stages, function(stage_name) {
   den1 <- as.dendrogram(hclust(d = dist(x = m1)))
   plot <- ggdendrogram(data = den1, rotate = TRUE)
   ggsave(paste0("dendrogram_", file_stage, ".png"))
+
+  df1 <- as.table(m1) %>%
+    as.data.frame() %>%
+    as_tibble()
+
+  plot <- ggplot(df1, aes(x = Var1, y = Var2)) +
+    geom_tile(aes(fill = Freq)) +
+    scale_fill_gradient2() +
+    scale_x_discrete(drop = FALSE) +
+    scale_y_discrete(drop = FALSE, limits = rev) +
+    theme(
+      # Rotate the x-axis lables so they are legible
+      axis.text.x = element_text(angle = 270, hjust = 0),
+      # Force the plot into a square aspect ratio
+      aspect.ratio = 1,
+    )
+
+  ggsave(paste0("mi_", file_stage, ".png"))
 })
