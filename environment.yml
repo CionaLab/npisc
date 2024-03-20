@@ -21,3 +21,6 @@ dependencies:
   - lxml=5.1
   - requests=2.31
   - networkx=3.2
+  - geojson=3.1
+  - geopandas=0.14
+  - seaborn=0.12
