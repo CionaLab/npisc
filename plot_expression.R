@@ -77,20 +77,26 @@ map(stages, function(stage_name) {
   m1 <- df %>%
     group_by(gene, territory) %>%
     count() %>%
-    pivot_wider(names_from = territory, values_from = n, values_fill = 0) %>%
-    column_to_rownames(var = "gene") %>%
-    mutinformation(method = "emp")
+    mutate_at(vars(n), ~ ifelse(. > 0, 1, 0)) %>%
+    pivot_wider(names_from = gene, values_from = n, values_fill = 0) %>%
+    column_to_rownames(var = "territory") %>%
+    proxy::dist(method = "Jaccard")
 
-  den1 <- as.dendrogram(hclust(d = dist(x = m1)))
+  den1 <- hclust(m1) %>% as.dendrogram()
   plot <- ggdendrogram(data = den1, rotate = TRUE)
   ggsave(paste0("dendrogram_", file_stage, ".png"))
 
-  df1 <- as.table(m1) %>%
+  df1 <- as.matrix(m1) %>%
     as.data.frame() %>%
-    as_tibble()
+    rownames_to_column("blastomere_1") %>%
+    pivot_longer(
+      -blastomere_1,
+      names_to = "blastomere_2",
+      values_to = "jaccard_distance"
+    )
 
-  plot <- ggplot(df1, aes(x = Var1, y = Var2)) +
-    geom_tile(aes(fill = Freq)) +
+  plot <- ggplot(df1, aes(x = blastomere_1, y = blastomere_2)) +
+    geom_tile(aes(fill = jaccard_distance)) +
     scale_fill_gradient2() +
     scale_x_discrete(drop = FALSE) +
     scale_y_discrete(drop = FALSE, limits = rev) +
@@ -101,7 +107,7 @@ map(stages, function(stage_name) {
       aspect.ratio = 1,
     )
 
-  ggsave(paste0("mi_", file_stage, ".png"))
+  ggsave(paste0("ji_", file_stage, ".png"))
 })
 
 # Use map to iterate over stages
@@ -160,20 +166,26 @@ map(stages, function(stage_name) {
   m1 <- df %>%
     group_by(gene, territory_eq) %>%
     count() %>%
-    pivot_wider(names_from = territory_eq, values_from = n, values_fill = 0) %>%
-    column_to_rownames(var = "gene") %>%
-    mutinformation(method = "emp")
+    mutate_at(vars(n), ~ ifelse(. > 0, 1, 0)) %>%
+    pivot_wider(names_from = gene, values_from = n, values_fill = 0) %>%
+    column_to_rownames(var = "territory_eq") %>%
+    proxy::dist(method = "Jaccard")
 
-  den1 <- as.dendrogram(hclust(d = dist(x = m1)))
+  den1 <- hclust(m1) %>% as.dendrogram()
   plot <- ggdendrogram(data = den1, rotate = TRUE)
   ggsave(paste0("dendrogram_", file_stage, ".png"))
 
-  df1 <- as.table(m1) %>%
+  df1 <- as.matrix(m1) %>%
     as.data.frame() %>%
-    as_tibble()
+    rownames_to_column("blastomere_1") %>%
+    pivot_longer(
+      -blastomere_1,
+      names_to = "blastomere_2",
+      values_to = "jaccard_distance"
+    )
 
-  plot <- ggplot(df1, aes(x = Var1, y = Var2)) +
-    geom_tile(aes(fill = Freq)) +
+  plot <- ggplot(df1, aes(x = blastomere_1, y = blastomere_2)) +
+    geom_tile(aes(fill = jaccard_distance)) +
     scale_fill_gradient2() +
     scale_x_discrete(drop = FALSE) +
     scale_y_discrete(drop = FALSE, limits = rev) +
@@ -184,5 +196,5 @@ map(stages, function(stage_name) {
       aspect.ratio = 1,
     )
 
-  ggsave(paste0("mi_", file_stage, ".png"))
+  ggsave(paste0("ji_", file_stage, ".png"))
 })
