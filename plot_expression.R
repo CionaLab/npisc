@@ -2,6 +2,7 @@ library(tidyverse)
 library(geojsonio)
 library(infotheo)
 library(ggdendro)
+library(ggpubr)
 
 # Renaming function
 f_rename <- function(.data) {
@@ -59,21 +60,6 @@ map(stages, function(stage_name) {
   file_stage <- paste0(file_stage, "_orig")
   ggsave(paste0("choropleth_", file_stage, ".png"))
 
-  plot <- ggplot(df, aes(x = gene, y = territory)) +
-    geom_raster() +
-    scale_x_discrete(drop = FALSE) +
-    scale_y_discrete(drop = FALSE) +
-    theme(
-      # Rotate the x-axis lables so they are legible
-      axis.text.x = element_text(angle = 270, hjust = 0),
-      # Force the plot into a square aspect ratio
-      aspect.ratio = 1,
-      # Hide the legend (optional)
-      legend.position = "none"
-    )
-
-  ggsave(paste0("matrix_", file_stage, ".png"))
-
   m1 <- df %>%
     group_by(gene, territory) %>%
     count() %>%
@@ -83,8 +69,18 @@ map(stages, function(stage_name) {
     proxy::dist(method = "Jaccard")
 
   den1 <- hclust(m1) %>% as.dendrogram()
-  plot <- ggdendrogram(data = den1, rotate = TRUE)
-  ggsave(paste0("dendrogram_", file_stage, ".png"))
+  den1_order <- order.dendrogram(den1)
+  plot <- ggdendrogram(data = den1, rotate = FALSE) +
+    theme(
+      axis.text.x = element_blank(),
+    )
+
+  ggsave(
+    paste0("dendrogram_", file_stage, ".png"),
+    width = 10,
+    height = 3,
+    units = "in"
+  )
 
   df1 <- as.matrix(m1) %>%
     as.data.frame() %>%
@@ -93,6 +89,18 @@ map(stages, function(stage_name) {
       -blastomere_1,
       names_to = "blastomere_2",
       values_to = "jaccard_distance"
+    ) %>%
+    mutate(
+      blastomere_1 = as_factor(blastomere_1),
+      blastomere_1 = fct_relevel(
+        blastomere_1,
+        levels(blastomere_1)[den1_order]
+      ),
+      blastomere_2 = as_factor(blastomere_2),
+      blastomere_2 = fct_relevel(
+        blastomere_2,
+        levels(blastomere_2)[den1_order]
+      )
     )
 
   plot <- ggplot(df1, aes(x = blastomere_1, y = blastomere_2)) +
@@ -105,9 +113,15 @@ map(stages, function(stage_name) {
       axis.text.x = element_text(angle = 270, hjust = 0),
       # Force the plot into a square aspect ratio
       aspect.ratio = 1,
+      legend.position = "none"
     )
 
-  ggsave(paste0("ji_", file_stage, ".png"))
+  ggsave(
+    paste0("ji_", file_stage, ".png"),
+    width = 10,
+    height = 10,
+    units = "in"
+  )
 })
 
 # Use map to iterate over stages
@@ -148,21 +162,6 @@ map(stages, function(stage_name) {
 
   ggsave(paste0("choropleth_", file_stage, ".png"))
 
-  plot <- ggplot(df, aes(x = gene, y = territory_eq)) +
-    geom_raster() +
-    scale_x_discrete(drop = FALSE) +
-    scale_y_discrete(drop = FALSE) +
-    theme(
-      # Rotate the x-axis lables so they are legible
-      axis.text.x = element_text(angle = 270, hjust = 0),
-      # Force the plot into a square aspect ratio
-      aspect.ratio = 1,
-      # Hide the legend (optional)
-      legend.position = "none"
-    )
-
-  ggsave(paste0("matrix_", file_stage, ".png"))
-
   m1 <- df %>%
     group_by(gene, territory_eq) %>%
     count() %>%
@@ -172,8 +171,18 @@ map(stages, function(stage_name) {
     proxy::dist(method = "Jaccard")
 
   den1 <- hclust(m1) %>% as.dendrogram()
-  plot <- ggdendrogram(data = den1, rotate = TRUE)
-  ggsave(paste0("dendrogram_", file_stage, ".png"))
+  den1_order <- order.dendrogram(den1)
+  plot <- ggdendrogram(data = den1, rotate = FALSE) +
+    theme(
+      axis.text.x = element_blank(),
+    )
+
+  ggsave(
+    paste0("dendrogram_", file_stage, ".png"),
+    width = 10,
+    height = 3,
+    units = "in"
+  )
 
   df1 <- as.matrix(m1) %>%
     as.data.frame() %>%
@@ -182,6 +191,18 @@ map(stages, function(stage_name) {
       -blastomere_1,
       names_to = "blastomere_2",
       values_to = "jaccard_distance"
+    ) %>%
+    mutate(
+      blastomere_1 = as_factor(blastomere_1),
+      blastomere_1 = fct_relevel(
+        blastomere_1,
+        levels(blastomere_1)[den1_order]
+      ),
+      blastomere_2 = as_factor(blastomere_2),
+      blastomere_2 = fct_relevel(
+        blastomere_2,
+        levels(blastomere_2)[den1_order]
+      )
     )
 
   plot <- ggplot(df1, aes(x = blastomere_1, y = blastomere_2)) +
@@ -194,7 +215,13 @@ map(stages, function(stage_name) {
       axis.text.x = element_text(angle = 270, hjust = 0),
       # Force the plot into a square aspect ratio
       aspect.ratio = 1,
+      legend.position = "none"
     )
 
-  ggsave(paste0("ji_", file_stage, ".png"))
+  ggsave(
+    paste0("ji_", file_stage, ".png"),
+    width = 10,
+    height = 10,
+    units = "in"
+  )
 })
