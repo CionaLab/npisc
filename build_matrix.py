@@ -1,4 +1,4 @@
-from typing import Dict, Union, Tuple, Iterable
+from typing import Dict, Union, Tuple, Iterable, Callable
 from itertools import tee
 import re
 import numpy as np
@@ -168,19 +168,21 @@ def split_adata(adata: anndata.AnnData, col: str) -> Dict[str, anndata.AnnData]:
     return {value: adata[adata.obs[col] == value] for value in adata.obs[col].unique()}
 
 
-def get_cos_similarity(
+def get_distance(
     obj1: Union[anndata.AnnData, pd.DataFrame],
     obj2: Union[anndata.AnnData, pd.DataFrame],
+    metric: str | Callable = "euclidean",
 ) -> pd.DataFrame:
     """
-    Compute the cosine similarity between two objects (either AnnData or DataFrame).
+    Compute the distance between two objects (either AnnData or DataFrame) using the specified metric.
 
     Parameters:
-    - obj1 (Union[anndata.AnnData, pd.DataFrame]): First object (either AnnData or DataFrame).
-    - obj2 (Union[anndata.AnnData, pd.DataFrame]): Second object (either AnnData or DataFrame).
+    - obj1 (Union[anndata.AnnData, pd.DataFrame]): The first object (either AnnData or DataFrame).
+    - obj2 (Union[anndata.AnnData, pd.DataFrame]): The second object (either AnnData or DataFrame).
+    - metric (str, optional): The distance metric to use. Defaults to "euclidean".
 
     Returns:
-    - pd.DataFrame: A dataframe of cosine similarity values.
+    - pd.DataFrame: A dataframe of distance values between the two objects.
     """
 
     # Convert AnnData to DataFrame if necessary
@@ -203,7 +205,7 @@ def get_cos_similarity(
     arr2 = df2.to_numpy()
 
     similarity_df = pd.DataFrame(
-        pairwise_distances(arr1, arr2, metric="cosine"),
+        pairwise_distances(arr1, arr2, metric=metric),
         index=df1.index,
         columns=df2.index,
     )
@@ -325,7 +327,8 @@ def compute_stage_similarity(df: pd.DataFrame) -> Dict[Tuple[int, int], pd.DataF
 
     # Calculate cosine similarity for adjacent groups using pairwise and dictionary comprehension
     similarities = {
-        (round1, round2): get_cos_similarity(adj_matrices[round1], adj_matrices[round2])
+        (round1, round2): 1
+        - get_distance(adj_matrices[round1], adj_matrices[round2], metric="cosine")
         for round1, round2 in pairwise(grouped.keys())
     }
 
@@ -347,7 +350,7 @@ def find_similar_clusters(
     """
 
     # Calculate cosine similarity using the existing function
-    cos_sim = get_cos_similarity(adata1, adata2)
+    cos_sim = 1 - get_distance(adata1, adata2, metric="cosine")
 
     # Group by Leiden clusters in adata1
     group1 = adata1.obs["leiden"]
