@@ -6,6 +6,7 @@ from scipy.spatial import distance
 import pandas as pd
 import anndata
 from sklearn.preprocessing import normalize
+from sklearn.metrics import pairwise_distances
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -201,20 +202,17 @@ def get_cos_similarity(
     arr1 = df1.to_numpy()
     arr2 = df2.to_numpy()
 
-    # Normalize both arrays using L2 norm
-    arr1 = normalize(arr1, axis=1, norm="l2")
-    arr2 = normalize(arr2, axis=1, norm="l2")
-
-    # Compute cosine similarity
-    similarity = arr1 @ arr2.T
-
-    # Convert the result back to a dataframe with appropriate row and column names
-    similarity_df = pd.DataFrame(similarity, index=df1.index, columns=df2.index)
+    similarity_df = pd.DataFrame(
+        pairwise_distances(arr1, arr2, metric="cosine"),
+        index=df1.index,
+        columns=df2.index,
+    )
 
     # Sort the result
     similarity_df = similarity_df.sort_index(axis=0).sort_index(axis=1)
 
     return similarity_df
+
 
 def get_mahalanobis_distance(
     obj1: Union[anndata.AnnData, pd.DataFrame],
