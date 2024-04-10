@@ -102,6 +102,44 @@ def build_from_df(df: pd.DataFrame) -> pd.DataFrame:
     return mat
 
 
+def to_df(obj: Union[anndata.AnnData, pd.DataFrame]) -> pd.DataFrame:
+    """
+    Convert an AnnData or DataFrame to a DataFrame.
+
+    Parameters:
+    - obj (Union[anndata.AnnData, pd.DataFrame]): The object to convert.
+
+    Returns:
+    - pd.DataFrame: The converted DataFrame.
+    """
+    return (
+        pd.DataFrame(obj.X, columns=obj.var_names, index=obj.obs_names)
+        if isinstance(obj, anndata.AnnData)
+        else obj
+    )
+
+
+def to_obj(
+    obj: Union[anndata.AnnData, pd.DataFrame], df: pd.DataFrame
+) -> Union[anndata.AnnData, pd.DataFrame]:
+    """
+    Convert a DataFrame back to its original type (either AnnData or DataFrame).
+
+    Parameters:
+    - obj (Union[anndata.AnnData, pd.DataFrame]): The original object.
+    - df (pd.DataFrame): The DataFrame to convert.
+
+    Returns:
+    - Union[anndata.AnnData, pd.DataFrame]: The converted object.
+    """
+    if isinstance(obj, anndata.AnnData):
+        obj.X = df.values
+        obj.var_names = df.columns
+    elif isinstance(obj, pd.DataFrame):
+        obj = df
+    return obj
+
+
 def pad_compatible(
     obj1: Union[anndata.AnnData, pd.DataFrame],
     obj2: Union[anndata.AnnData, pd.DataFrame],
@@ -117,17 +155,8 @@ def pad_compatible(
     - tuple: Tuple containing the adjusted objects.
     """
 
-    # Convert AnnData to DataFrame if necessary
-    df1 = (
-        pd.DataFrame(obj1.X, columns=obj1.var_names, index=obj1.obs_names)
-        if isinstance(obj1, anndata.AnnData)
-        else obj1
-    )
-    df2 = (
-        pd.DataFrame(obj2.X, columns=obj2.var_names, index=obj2.obs_names)
-        if isinstance(obj2, anndata.AnnData)
-        else obj2
-    )
+    df1 = to_df(obj1)
+    df2 = to_df(obj2)
 
     # Get union of columns from both dataframes
     all_cols = df1.columns.union(df2.columns)
@@ -136,18 +165,9 @@ def pad_compatible(
     df1 = df1.reindex(columns=all_cols, fill_value=0)
     df2 = df2.reindex(columns=all_cols, fill_value=0)
 
-    # Convert back to AnnData if original objects were AnnData
-    if isinstance(obj1, anndata.AnnData):
-        obj1.X = df1.values
-        obj1.var_names = all_cols
-    elif isinstance(obj1, pd.DataFrame):
-        obj1 = df1
-
-    if isinstance(obj2, anndata.AnnData):
-        obj2.X = df2.values
-        obj2.var_names = all_cols
-    elif isinstance(obj2, pd.DataFrame):
-        obj2 = df2
+    # Now you can use this function in your code like this:
+    obj1 = to_obj(obj1, df1)
+    obj2 = to_obj(obj2, df2)
 
     return obj1, obj2
 
@@ -185,17 +205,8 @@ def get_distance(
     - pd.DataFrame: A dataframe of distance values between the two objects.
     """
 
-    # Convert AnnData to DataFrame if necessary
-    df1 = (
-        pd.DataFrame(obj1.X, columns=obj1.var_names, index=obj1.obs_names)
-        if isinstance(obj1, anndata.AnnData)
-        else obj1
-    )
-    df2 = (
-        pd.DataFrame(obj2.X, columns=obj2.var_names, index=obj2.obs_names)
-        if isinstance(obj2, anndata.AnnData)
-        else obj2
-    )
+    df1 = to_df(obj1)
+    df2 = to_df(obj2)
 
     # Ensure both dataframes have the same columns
     df1, df2 = pad_compatible(df1, df2)
@@ -231,17 +242,8 @@ def get_mahalanobis_distance(
     - pd.DataFrame: A dataframe of Mahalanobis distance values.
     """
 
-    # Convert AnnData to DataFrame if necessary
-    df1 = (
-        pd.DataFrame(obj1.X, columns=obj1.var_names, index=obj1.obs_names)
-        if isinstance(obj1, anndata.AnnData)
-        else obj1
-    )
-    df2 = (
-        pd.DataFrame(obj2.X, columns=obj2.var_names, index=obj2.obs_names)
-        if isinstance(obj2, anndata.AnnData)
-        else obj2
-    )
+    df1 = to_df(obj1)
+    df2 = to_df(obj2)
 
     # Ensure both dataframes have the same columns
     df1, df2 = pad_compatible(df1, df2)
