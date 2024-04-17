@@ -268,19 +268,22 @@ def get_mahalanobis_distance(
     return distance_df
 
 
-def pairwise(iterable: Iterable) -> Iterable[Tuple[int, int]]:
+def adjacent(iterable: Iterable, n: int = 2) -> Iterable[Tuple[Iterable, ...]]:
     """
-    Return pairs of adjacent elements from the input iterable.
+    Return n-tuples of adjacent elements from the input iterable.
 
     Parameters:
     - iterable (Iterable): Input iterable.
+    - n (int): The number of elements in each tuple.
 
     Returns:
-    - Iterable[Tuple[int, int]]: Iterable producing pairs of adjacent elements.
+    - Iterable[Tuple[Iterable, ...]]: Iterable producing n-tuples of adjacent elements.
     """
-    a, b = tee(iterable)
-    next(b, None)
-    return zip(a, b)
+    iterators = tee(iterable, n)
+    for i, iterator in enumerate(iterators):
+        for _ in range(i):
+            next(iterator, None)
+    return zip(*iterators)
 
 
 def parse_territory(territory: str) -> Tuple[str, int, str]:
@@ -331,7 +334,7 @@ def compute_stage_similarity(df: pd.DataFrame) -> Dict[Tuple[int, int], pd.DataF
     similarities = {
         (round1, round2): 1
         - get_distance(adj_matrices[round1], adj_matrices[round2], metric="cosine")
-        for round1, round2 in pairwise(grouped.keys())
+        for round1, round2 in adjacent(grouped.keys())
     }
 
     return similarities
