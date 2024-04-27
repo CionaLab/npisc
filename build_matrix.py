@@ -376,6 +376,36 @@ def find_similar_clusters(
     )
 
 
+def find_coi(
+    df: pd.DataFrame,
+    adata: anndata.AnnData,
+    cluster: str = "leiden",
+    blastomere: str = "Territory_eq",
+) -> pd.DataFrame:
+    """
+    This function finds the clusters of interest based on the expression similarity to blastomeres in the DataFrame.
+
+    Parameters:
+    - df (pandas.DataFrame): The input DataFrame containing the similarity matrix.
+    - adata (anndata.AnnData): The input AnnData object.
+    - cluster (str, optional): The column name in adata.obs based on which the clusters of interest are determined. Default is "leiden".
+    - blastomere (str, optional): The column name in df representing the blastomere. Default is "Territory_eq".
+
+    Returns:
+    - pandas.DataFrame: A DataFrame containing the maximum values for each cluster based on the specified blastomere.
+    """
+    df = (
+        df.melt(ignore_index=False)
+        .join(adata.obs[cluster])
+        .groupby([cluster, blastomere])
+        .median()
+        .reset_index()
+    )
+    return df.loc[df.groupby(cluster)["value"].idxmax()].sort_values(
+        "value", ascending=False
+    )
+
+
 def plot_distance(matrix: pd.DataFrame) -> None:
     """
     Plot a heatmap and dendrogram of a distance matrix.
