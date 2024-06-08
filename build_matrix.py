@@ -1,8 +1,9 @@
 from typing import Dict, Union, Tuple, Iterable, Callable
-from itertools import tee
+from itertools import tee, product
 import re
 import numpy as np
 from scipy.spatial import distance
+from scipy.stats import wasserstein_distance_nd
 import pandas as pd
 import anndata
 from sklearn.preprocessing import normalize
@@ -347,33 +348,30 @@ def find_similar_clusters(
     Find the most similar Leiden cluster pairs between two AnnData objects.
 
     Parameters:
-    - adata1 (anndata.AnnData): First AnnData object with Leiden clustering.
-    - adata2 (anndata.AnnData): Second AnnData object with Leiden clustering.
+    - adata1 (anndata.AnnData): The first AnnData object with Leiden clustering.
+    - adata2 (anndata.AnnData): The second AnnData object with Leiden clustering.
 
     Returns:
-    - pd.DataFrame: A dataframe with the most similar Leiden cluster pairs and their average cosine similarity.
+    - pd.DataFrame: A dataframe with the most similar Leiden cluster pairs and their Wasserstein distance.
     """
 
-    # Calculate cosine similarity using the existing function
-    cos_sim = 1 - get_distance(adata1, adata2, metric="cosine")
+    adata1, adata2 = pad_compatible(adata1, adata2)
+    split_adata1 = split_adata(adata1, col="leiden")
+    split_adata2 = split_adata(adata2, col="leiden")
 
-    # Group by Leiden clusters in adata1
-    group1 = adata1.obs["leiden"]
-    mean_sim1 = cos_sim.groupby(group1, axis=0).mean()
+    split_adata1 = {name: to_df(data) for name, data in split_adata1.items()}
+    split_adata2 = {name: to_df(data) for name, data in split_adata2.items()}
 
-    # Group by Leiden clusters in adata2
-    group2 = adata2.obs["leiden"]
-    mean_sim2 = mean_sim1.groupby(group2, axis=1).mean()
+    distances = [
+        (name1, name2, wasserstein_distance_nd(data1, data2))
+        for (name1, data1), (name2, data2) in product(
+            split_adata1.items(), split_adata2.items()
+        )
+    ]
 
-    # Flatten the dataframe and reset index
-    flattened = mean_sim2.reset_index().melt(
-        id_vars="leiden", var_name="leiden_2", value_name="similarity"
-    )
+    df = pd.DataFrame(distances, columns=["leiden_1", "leiden_2", "distance"])
 
-    # Sort by similarity and return
-    return flattened.sort_values(by="similarity", ascending=False).reset_index(
-        drop=True
-    )
+    return df.sort_values(by="distance").reset_index(drop=True)
 
 
 def find_coi(
