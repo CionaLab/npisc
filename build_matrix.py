@@ -1,4 +1,4 @@
-from typing import Dict, Union, Tuple, Iterable, Callable
+from typing import Dict, Union, Tuple, Iterable, Callable, List
 from itertools import tee, product
 import re
 import numpy as np
@@ -231,16 +231,20 @@ def get_distance(
 def get_mahalanobis_distance(
     obj1: Union[anndata.AnnData, pd.DataFrame],
     obj2: Union[anndata.AnnData, pd.DataFrame],
+    output_similarity: bool = False,
 ) -> pd.DataFrame:
     """
     Compute the Mahalanobis distance between two objects (either AnnData or DataFrame).
+    Each RNAseq cell is a row vector. Covariances are calculated from obj1.
 
     Parameters:
-    - obj1 (Union[anndata.AnnData, pd.DataFrame]): First object (either AnnData or DataFrame).
-    - obj2 (Union[anndata.AnnData, pd.DataFrame]): Second object (either AnnData or DataFrame).
+    - obj1 (Union[anndata.AnnData, pd.DataFrame]): The first object (either AnnData or DataFrame).
+    - obj2 (Union[anndata.AnnData, pd.DataFrame]): The second object (either AnnData or DataFrame).
+    - output_similarity (bool, optional): If True, output the similarity matrix instead of the distance matrix.
+                                          Defaults to False.
 
     Returns:
-    - pd.DataFrame: A dataframe of Mahalanobis distance values.
+    - pd.DataFrame: A dataframe of Mahalanobis distance or similarity values.
     """
 
     df1 = to_df(obj1)
@@ -253,20 +257,22 @@ def get_mahalanobis_distance(
     arr1 = df1.to_numpy()
     arr2 = df2.to_numpy()
 
-    # Calculate the covariance matrix
-    cov_matrix = np.cov(arr1.T)
-    inv_cov_matrix = np.linalg.inv(cov_matrix)
+    # Calculate the gene experience covariance matrix
+    cov = np.cov(arr1, rowvar=False)
+    cov_i = np.linalg.pinv(cov)
 
-    # Compute Mahalanobis distance
-    distance_matrix = distance.cdist(arr1, arr2, metric='mahalanobis', VI=inv_cov_matrix)
+    df_distance = pd.DataFrame(
+        pairwise_distances(arr1, arr2, metric="mahalanobis", VI=cov_i, n_jobs=-1),
+        index=df1.index,
+        columns=df2.index,
+    )
 
-    # Convert the result back to a dataframe with appropriate row and column names
-    distance_df = pd.DataFrame(distance_matrix, index=df1.index, columns=df2.index)
+    df_distance = df_distance.sort_index(axis=0).sort_index(axis=1)
 
-    # Sort the result
-    distance_df = distance_df.sort_index(axis=0).sort_index(axis=1)
-
-    return distance_df
+    if not output_similarity:
+        return df_distance
+    else:
+        return 1 - (df_distance / df_distance.to_numpy().max())
 
 
 def adjacent(iterable: Iterable, n: int = 2) -> Iterable[Tuple[Iterable, ...]]:
@@ -379,29 +385,33 @@ def find_coi(
     adata: anndata.AnnData,
     cluster: str = "leiden",
     blastomere: str = "Territory_eq",
-) -> pd.DataFrame:
+    quantile: float = 0.4,
+) -> List:
     """
-    This function finds the clusters of interest based on the expression similarity to blastomeres in the DataFrame.
+    Find the cells of interest based on the expression similarity to blastomeres in the DataFrame.
 
     Parameters:
     - df (pandas.DataFrame): The input DataFrame containing the similarity matrix.
     - adata (anndata.AnnData): The input AnnData object.
     - cluster (str, optional): The column name in adata.obs based on which the clusters of interest are determined. Default is "leiden".
     - blastomere (str, optional): The column name in df representing the blastomere. Default is "Territory_eq".
+    - quantile (float, optional): The quantile value used to determine the similarity threshold. Default is 0.4.
 
     Returns:
-    - pandas.DataFrame: A DataFrame containing the maximum values for each cluster based on the specified blastomere.
+    - List: A list of cluster labels that have expression similarity to blastomeres above the specified quantile threshold.
+
     """
     df = (
         df.melt(ignore_index=False)
         .join(adata.obs[cluster])
-        .groupby([cluster, blastomere])
-        .median()
-        .reset_index()
+        .groupby(blastomere)
+        .apply(
+            lambda x: x[x["value"] <= x["value"].quantile(quantile)],
+            include_groups=False,
+        )
+        .reset_index(level=blastomere)
     )
-    return df.loc[df.groupby(cluster)["value"].idxmax()].sort_values(
-        "value", ascending=False
-    )
+    return df.index.astype(str).unique().to_list()
 
 
 def plot_distance(matrix: pd.DataFrame) -> None:
