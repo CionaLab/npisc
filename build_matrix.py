@@ -7,6 +7,7 @@ from scipy.sparse import issparse
 from scipy.stats import wasserstein_distance_nd
 import pandas as pd
 import anndata
+import scanpy as sc
 from sklearn.preprocessing import normalize
 from sklearn.metrics import pairwise_distances
 import seaborn as sns
@@ -102,6 +103,25 @@ def build_from_df(df: pd.DataFrame) -> pd.DataFrame:
     mat = (mat > 0).astype(int)
 
     return mat
+
+
+def append_raw(adata: anndata.AnnData, adata_raw: anndata.AnnData) -> anndata.AnnData:
+    """
+    Append the observation data to raw data.
+
+    Parameters:
+    - adata (anndata.AnnData): The AnnData object to append the raw data to.
+    - adata_raw (anndata.AnnData): The AnnData object containing the raw data to append.
+
+    Returns:
+    - anndata.AnnData: The AnnData object with the raw data appended.
+    """
+
+    adata_raw.obs = adata_raw.obs.merge(
+        adata.obs, how="left", left_index=True, right_index=True, suffixes=("_raw", None)
+    )
+
+    return adata_raw
 
 
 def to_df(obj: Union[anndata.AnnData, pd.DataFrame]) -> pd.DataFrame:
@@ -231,10 +251,35 @@ def get_distance(
     return similarity_df
 
 
+def compute_mahalanobis_distance(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
+    """
+    Compute the Mahalanobis distance between two dataframes.
+
+    Parameters:
+    - df1 (pd.DataFrame): A dataframe with pattern.
+    - df2 (pd.DataFrame): A dataframe with clusters.
+
+    Returns:
+    - pd.DataFrame: A dataframe of Mahalanobis distance values.
+    """
+
+    mu = df2.mean(axis=0)
+    if isinstance(mu, pd.Series):
+        mu = mu.to_numpy()
+    mu = mu.reshape(1, -1)
+    cov = np.cov(df2, rowvar=False)
+    cov_i = np.linalg.pinv(cov)
+
+    df_distance = pd.DataFrame(
+        pairwise_distances(mu, df1, metric="mahalanobis", VI=cov_i, n_jobs=-1),
+    )
+    return df_distance
+
+
 def get_mahalanobis_distance(
-    obj1: Union[anndata.AnnData, pd.DataFrame],
-    obj2: Union[anndata.AnnData, pd.DataFrame],
-    output_similarity: bool = False,
+    df: pd.DataFrame,
+    adata: anndata.AnnData,
+    cluster: str = "leiden",
 ) -> pd.DataFrame:
     """
     Compute the Mahalanobis distance between two objects (either AnnData or DataFrame).
@@ -250,32 +295,22 @@ def get_mahalanobis_distance(
     - pd.DataFrame: A dataframe of Mahalanobis distance or similarity values.
     """
 
-    df1 = to_df(obj1)
-    df2 = to_df(obj2)
+    df, adata = pad_compatible(df, adata)
 
-    # Ensure both dataframes have the same columns
-    df1, df2 = pad_compatible(df1, df2)
+    sc.tl.pca(adata, svd_solver="arpack")
 
-    # Convert dataframes to numpy arrays
-    arr1 = df1.to_numpy()
-    arr2 = df2.to_numpy()
+    adatas = split_adata(adata, cluster)
 
-    # Calculate the gene experience covariance matrix
-    cov = np.cov(arr1, rowvar=False)
-    cov_i = np.linalg.pinv(cov)
+    d_distance = {
+        k: compute_mahalanobis_distance(df @ v.varm["PCs"], to_df(v.obsm["X_pca"]))
+        for k, v in adatas.items()
+    }
 
-    df_distance = pd.DataFrame(
-        pairwise_distances(arr1, arr2, metric="mahalanobis", VI=cov_i, n_jobs=-1),
-        index=df1.index,
-        columns=df2.index,
-    )
+    df_distance = pd.concat(d_distance).reset_index(level=1, drop=True)
 
-    df_distance = df_distance.sort_index(axis=0).sort_index(axis=1)
+    df_distance.columns = df.index
 
-    if not output_similarity:
-        return df_distance
-    else:
-        return 1 - (df_distance / df_distance.to_numpy().max())
+    return df_distance
 
 
 def adjacent(iterable: Iterable, n: int = 2) -> Iterable[Tuple[Iterable, ...]]:
