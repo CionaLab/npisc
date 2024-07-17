@@ -3,6 +3,7 @@ from itertools import tee, product
 import re
 import numpy as np
 from scipy.spatial import distance
+from scipy.sparse import issparse
 from scipy.stats import wasserstein_distance_nd
 import pandas as pd
 import anndata
@@ -113,11 +114,13 @@ def to_df(obj: Union[anndata.AnnData, pd.DataFrame]) -> pd.DataFrame:
     Returns:
     - pd.DataFrame: The converted DataFrame.
     """
-    return (
-        pd.DataFrame(obj.X, columns=obj.var_names, index=obj.obs_names)
-        if isinstance(obj, anndata.AnnData)
-        else obj
-    )
+    if isinstance(obj, anndata.AnnData):
+        if issparse(obj.X):
+            return pd.DataFrame(
+                obj.X.toarray(), columns=obj.var_names, index=obj.obs_names
+            )
+        return pd.DataFrame(obj.X, columns=obj.var_names, index=obj.obs_names)
+    return obj
 
 
 def to_obj(
