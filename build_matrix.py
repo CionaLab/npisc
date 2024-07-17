@@ -137,11 +137,11 @@ def to_obj(
     - Union[anndata.AnnData, pd.DataFrame]: The converted object.
     """
     if isinstance(obj, anndata.AnnData):
-        obj.X = df.values
-        obj.var_names = df.columns
+        return anndata.AnnData(
+            X=df.values, var=pd.DataFrame(index=df.columns), obs=obj.obs, uns=obj.uns
+        )
     elif isinstance(obj, pd.DataFrame):
-        obj = df
-    return obj
+        return df
 
 
 def pad_compatible(
