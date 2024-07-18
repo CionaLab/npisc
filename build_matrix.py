@@ -297,6 +297,8 @@ def get_mahalanobis_distance(
 
     df, adata = pad_compatible(df, adata)
 
+    sc.pp.normalize_total(adata, target_sum=1e4)
+    sc.pp.log1p(adata)
     sc.tl.pca(adata, svd_solver="arpack")
 
     adatas = split_adata(adata, cluster)
