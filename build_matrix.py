@@ -1,19 +1,17 @@
-from typing import Dict, Union, Tuple, Iterable, Callable, List
-from itertools import tee, product
+"""
+This module contains functions for analyzing gene expression data.
+"""
+
+from typing import Dict, Union, Tuple, Iterable, Callable
+from itertools import tee
 import re
-import numpy as np
-from scipy.spatial import distance
+
 from scipy.sparse import issparse
-from scipy.stats import wasserstein_distance_nd
 import pandas as pd
 import anndata
-import scanpy as sc
-from sklearn.preprocessing import normalize
 from sklearn.metrics import pairwise_distances
-import seaborn as sns
-import matplotlib.pyplot as plt
 
-from .ontology import build_graph, node_to_leaves
+from ontology import build_graph, node_to_leaves
 
 
 def preprocess_tsv(
@@ -118,7 +116,11 @@ def append_raw(adata: anndata.AnnData, adata_raw: anndata.AnnData) -> anndata.An
     """
 
     adata_raw.obs = adata_raw.obs.merge(
-        adata.obs, how="left", left_index=True, right_index=True, suffixes=("_raw", None)
+        adata.obs,
+        how="left",
+        left_index=True,
+        right_index=True,
+        suffixes=("_raw", None),
     )
 
     return adata_raw
@@ -160,8 +162,9 @@ def to_obj(
         return anndata.AnnData(
             X=df.values, var=pd.DataFrame(index=df.columns), obs=obj.obs, uns=obj.uns
         )
-    elif isinstance(obj, pd.DataFrame):
+    if isinstance(obj, pd.DataFrame):
         return df
+    return None
 
 
 def pad_compatible(
@@ -172,8 +175,10 @@ def pad_compatible(
     Adjust both input objects (either AnnData or DataFrame) to have the same columns.
 
     Parameters:
-    - obj1 (Union[anndata.AnnData, pd.DataFrame]): First object (either AnnData or DataFrame).
-    - obj2 (Union[anndata.AnnData, pd.DataFrame]): Second object (either AnnData or DataFrame).
+    - obj1 (Union[anndata.AnnData, pd.DataFrame]): First object
+    (either AnnData or DataFrame).
+    - obj2 (Union[anndata.AnnData, pd.DataFrame]): Second object
+    (either AnnData or DataFrame).
 
     Returns:
     - tuple: Tuple containing the adjusted objects.
@@ -198,15 +203,17 @@ def pad_compatible(
 
 def split_adata(adata: anndata.AnnData, col: str) -> Dict[str, anndata.AnnData]:
     """
-    Splits an AnnData object into a dictionary of AnnData objects based on a column in adata.obs.
+    Splits an AnnData object into a dictionary of AnnData objects based on a
+    column in adata.obs.
 
     Parameters:
     - adata (anndata.AnnData): Input AnnData object.
-    - col (str): The column name in adata.obs based on which the splitting should be done.
+    - col (str): The column name in adata.obs based on which the splitting
+    should be done.
 
     Returns:
-    - Dict[str, anndata.AnnData]: Dictionary with unique values from the column as keys and
-                                  respective sub-AnnData objects as values.
+    - Dict[str, anndata.AnnData]: Dictionary with unique values from the column
+    as keys and respective sub-AnnData objects as values.
     """
 
     return {value: adata[adata.obs[col] == value] for value in adata.obs[col].unique()}
@@ -218,11 +225,14 @@ def get_distance(
     metric: str | Callable = "euclidean",
 ) -> pd.DataFrame:
     """
-    Compute the distance between two objects (either AnnData or DataFrame) using the specified metric.
+    Compute the distance between two objects (either AnnData or DataFrame) using
+    the specified metric.
 
     Parameters:
-    - obj1 (Union[anndata.AnnData, pd.DataFrame]): The first object (either AnnData or DataFrame).
-    - obj2 (Union[anndata.AnnData, pd.DataFrame]): The second object (either AnnData or DataFrame).
+    - obj1 (Union[anndata.AnnData, pd.DataFrame]): The first object
+    (either AnnData or DataFrame).
+    - obj2 (Union[anndata.AnnData, pd.DataFrame]): The second object
+    (either AnnData or DataFrame).
     - metric (str, optional): The distance metric to use. Defaults to "euclidean".
 
     Returns:
@@ -250,71 +260,6 @@ def get_distance(
 
     return similarity_df
 
-
-def compute_mahalanobis_distance(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
-    """
-    Compute the Mahalanobis distance between two dataframes.
-
-    Parameters:
-    - df1 (pd.DataFrame): A dataframe with pattern.
-    - df2 (pd.DataFrame): A dataframe with clusters.
-
-    Returns:
-    - pd.DataFrame: A dataframe of Mahalanobis distance values.
-    """
-
-    mu = df2.mean(axis=0)
-    if isinstance(mu, pd.Series):
-        mu = mu.to_numpy()
-    mu = mu.reshape(1, -1)
-    cov = np.cov(df2, rowvar=False)
-    cov_i = np.linalg.pinv(cov)
-
-    df_distance = pd.DataFrame(
-        pairwise_distances(mu, df1, metric="mahalanobis", VI=cov_i, n_jobs=-1),
-    )
-    return df_distance
-
-
-def get_mahalanobis_distance(
-    df: pd.DataFrame,
-    adata: anndata.AnnData,
-    cluster: str = "leiden",
-) -> pd.DataFrame:
-    """
-    Compute the Mahalanobis distance between two objects (either AnnData or DataFrame).
-    Each RNAseq cell is a row vector. Covariances are calculated from obj1.
-
-    Parameters:
-    - obj1 (Union[anndata.AnnData, pd.DataFrame]): The first object (either AnnData or DataFrame).
-    - obj2 (Union[anndata.AnnData, pd.DataFrame]): The second object (either AnnData or DataFrame).
-    - output_similarity (bool, optional): If True, output the similarity matrix instead of the distance matrix.
-                                          Defaults to False.
-
-    Returns:
-    - pd.DataFrame: A dataframe of Mahalanobis distance or similarity values.
-    """
-
-    df, adata = pad_compatible(df, adata)
-
-    sc.pp.normalize_total(adata, target_sum=1e4)
-    sc.pp.log1p(adata)
-    sc.tl.pca(adata, svd_solver="arpack")
-
-    adatas = split_adata(adata, cluster)
-
-    d_distance = {
-        k: compute_mahalanobis_distance(df @ v.varm["PCs"], to_df(v.obsm["X_pca"]))
-        for k, v in adatas.items()
-    }
-
-    df_distance = pd.concat(d_distance).reset_index(level=1, drop=True)
-
-    df_distance.columns = df.index
-
-    return df_distance
-
-
 def adjacent(iterable: Iterable, n: int = 2) -> Iterable[Tuple[Iterable, ...]]:
     """
     Return n-tuples of adjacent elements from the input iterable.
@@ -324,7 +269,8 @@ def adjacent(iterable: Iterable, n: int = 2) -> Iterable[Tuple[Iterable, ...]]:
     - n (int): The number of elements in each tuple.
 
     Returns:
-    - Iterable[Tuple[Iterable, ...]]: Iterable producing n-tuples of adjacent elements.
+    - Iterable[Tuple[Iterable, ...]]: Iterable producing n-tuples of adjacent
+    elements.
     """
     iterators = tee(iterable, n)
     for i, iterator in enumerate(iterators):
@@ -335,142 +281,18 @@ def adjacent(iterable: Iterable, n: int = 2) -> Iterable[Tuple[Iterable, ...]]:
 
 def parse_territory(territory: str) -> Tuple[str, int, str]:
     """
-    Parse the territory string into its components: cell lineage, rounds of division, and cell number.
+    Parse the territory string into its components: cell lineage, rounds of
+    division, and cell number.
 
     Parameters:
     - territory (str): The territory string, e.g., "A9.32".
 
     Returns:
-    - Tuple[str, int, str]: A tuple with cell lineage, rounds of division, and cell number.
+    - Tuple[str, int, str]: A tuple with cell lineage, rounds of division, and
+    cell number.
     """
     match = re.match(r"^([ABab])(\d+)\.(\d+\**)$", territory)
     if match:
         lineage, rounds, cell_num = match.groups()
         return lineage, int(rounds), cell_num
-    else:
-        return None, None, None
-
-
-def compute_stage_similarity(df: pd.DataFrame) -> Dict[Tuple[int, int], pd.DataFrame]:
-    """
-    Compute the cosine similarity between adjacency matrices of two adjacent division rounds.
-
-    Parameters:
-    - df (pd.DataFrame): The dataframe returned by preprocess_tsv.
-
-    Returns:
-    - Dict[Tuple[int, int], pd.DataFrame]: A dictionary where keys are tuples with two division rounds,
-                                           and values are dataframes of cosine similarity values between
-                                           the adjacency matrices of the two rounds.
-    """
-
-    # Apply the parse_territory function to the "Territory" column
-    df["Lineage"], df["Rounds"], df["Cell_Num"] = zip(
-        *df["Territory"].apply(parse_territory)
-    )
-
-    # Group the dataframe by the 'Rounds' column
-    grouped = {name: group for name, group in df.groupby("Rounds")}
-
-    # Build the adjacency matrix for each group
-    adj_matrices = {
-        round_num: build_from_df(round_df) for round_num, round_df in grouped.items()
-    }
-
-    # Calculate cosine similarity for adjacent groups using pairwise and dictionary comprehension
-    similarities = {
-        (round1, round2): 1
-        - get_distance(adj_matrices[round1], adj_matrices[round2], metric="cosine")
-        for round1, round2 in adjacent(grouped.keys())
-    }
-
-    return similarities
-
-
-def find_similar_clusters(
-    adata1: anndata.AnnData, adata2: anndata.AnnData
-) -> pd.DataFrame:
-    """
-    Find the most similar Leiden cluster pairs between two AnnData objects.
-
-    Parameters:
-    - adata1 (anndata.AnnData): The first AnnData object with Leiden clustering.
-    - adata2 (anndata.AnnData): The second AnnData object with Leiden clustering.
-
-    Returns:
-    - pd.DataFrame: A dataframe with the most similar Leiden cluster pairs and their Wasserstein distance.
-    """
-
-    adata1, adata2 = pad_compatible(adata1, adata2)
-    split_adata1 = split_adata(adata1, col="leiden")
-    split_adata2 = split_adata(adata2, col="leiden")
-
-    split_adata1 = {name: to_df(data) for name, data in split_adata1.items()}
-    split_adata2 = {name: to_df(data) for name, data in split_adata2.items()}
-
-    distances = [
-        (name1, name2, wasserstein_distance_nd(data1, data2))
-        for (name1, data1), (name2, data2) in product(
-            split_adata1.items(), split_adata2.items()
-        )
-    ]
-
-    df = pd.DataFrame(distances, columns=["leiden_1", "leiden_2", "distance"])
-
-    return df.sort_values(by="distance").reset_index(drop=True)
-
-
-def find_coi(
-    df: pd.DataFrame,
-    adata: anndata.AnnData,
-    cluster: str = "leiden",
-    blastomere: str = "Territory_eq",
-    quantile: float = 0.4,
-) -> List:
-    """
-    Find the cells of interest based on the expression similarity to blastomeres in the DataFrame.
-
-    Parameters:
-    - df (pandas.DataFrame): The input DataFrame containing the similarity matrix.
-    - adata (anndata.AnnData): The input AnnData object.
-    - cluster (str, optional): The column name in adata.obs based on which the clusters of interest are determined. Default is "leiden".
-    - blastomere (str, optional): The column name in df representing the blastomere. Default is "Territory_eq".
-    - quantile (float, optional): The quantile value used to determine the similarity threshold. Default is 0.4.
-
-    Returns:
-    - List: A list of cluster labels that have expression similarity to blastomeres above the specified quantile threshold.
-
-    """
-    df = (
-        df.melt(ignore_index=False)
-        .join(adata.obs[cluster])
-        .groupby(blastomere)
-        .apply(
-            lambda x: x[x["value"] <= x["value"].quantile(quantile)],
-            include_groups=False,
-        )
-        .reset_index(level=blastomere)
-    )
-    return df.index.astype(str).unique().to_list()
-
-
-def plot_distance(matrix: pd.DataFrame) -> None:
-    """
-    Plot a heatmap and dendrogram of a distance matrix.
-
-    Parameters:
-    - matrix (pd.DataFrame): DataFrame with the distance matrix.
-
-    Returns:
-    - None: Displays a heatmap and dendrogram.
-    """
-
-    # Fill diagonal and NaN values (if any) with 0 for better visualization
-    np.fill_diagonal(matrix.values, 0)
-    matrix = matrix.fillna(0)
-
-    # Plot heatmap and dendrogram using seaborn's clustermap
-    sns.clustermap(matrix, cmap="viridis", xticklabels=True, yticklabels=True)
-
-    # Display the plot
-    plt.show()
+    return None, None, None
