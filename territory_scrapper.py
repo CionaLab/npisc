@@ -11,15 +11,16 @@ def get_expression_info(
     url: str, verify_ssl: bool = True
 ) -> Tuple[Optional[str], Optional[str], List[str]]:
     """
-    Retrieve the "Stage", "Expression Territory", and "Predicted Gene" from the specified URL.
+    Retrieve the "Stage", "Expression Territory", and "Predicted Gene" from the
+    specified URL.
 
-    Args:
-    - url (str): The URL containing the desired information.
-    - verify_ssl (bool): Whether to verify SSL certificates.
-
-    Returns:
-    - Tuple[Optional[str], Optional[str], List[str]]: A tuple containing the stage, the predicted gene,
-      and a list of territories  or None if not reported.
+    :param url: The URL containing the desired information.
+    :type url: str
+    :param verify_ssl: Whether to verify SSL certificates.
+    :type verify_ssl: bool
+    :return: A tuple containing the stage, the predicted gene, and a list of
+    territories or None if not reported.
+    :rtype: Tuple[Optional[str], Optional[str], List[str]]
     """
     tree = fetch_parse(url, verify_ssl)
 

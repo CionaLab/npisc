@@ -11,6 +11,7 @@ import pandas as pd
 Method = Literal["logreg", "t-test", "wilcoxon", "t-test_overestim_var"]
 PostHoc = Literal["benjamini-hochberg", "bonferroni"]
 
+
 def diff_expression(
     adata: anndata.AnnData,
     groupby: str = "leiden",
@@ -22,23 +23,29 @@ def diff_expression(
     """
     Find differentially expressed genes for each cluster in an AnnData object.
 
-    Parameters:
-    - adata (anndata.AnnData): The AnnData object containing the expression data.
-    - groupby (str, optional): The column name in `adata.obs` that contains the
-      cluster labels. Default is "leiden".
-    - method (Method, optional): The statistical method to use for differential
-      expression analysis. Default is "t-test".
-    - posthoc (PostHoc, optional): The post-hoc correction method to use.
-      Default is "benjamini-hochberg".
-    - top (int, optional): The number of top differentially expressed genes to
-      select for each cluster. Default is 50.
-    - alpha (float, optional): The significance level for determining
-      differential expression. Default is 0.05.
+    :param adata: The AnnData object containing the expression data.
+    :type adata: anndata.AnnData
+    :param groupby: The column name in `adata.obs` that contains the cluster
+    labels. Default is "leiden".
+    :type groupby: str, optional
+    :param method: The statistical method to use for differential expression
+    analysis. Default is "t-test".
+    :type method: Method, optional
+    :param posthoc: The post-hoc correction method to use. Default is
+    "benjamini-hochberg".
+    :type posthoc: PostHoc, optional
+    :param top: The number of top differentially expressed genes to select for
+    each cluster. Default is 50.
+    :type top: int, optional
+    :param alpha: The significance level for determining differential
+    expression. Default is 0.05.
+    :type alpha: float, optional
 
-    Returns:
-    - pd.DataFrame: A dataframe containing the differentially expressed genes
-      for each cluster, sorted by log-fold change.
+    :return: A dataframe containing the differentially expressed genes for each
+    cluster, sorted by log-fold change.
+    :rtype: pd.DataFrame
     """
+
     sc.tl.rank_genes_groups(adata, groupby, method=method, corr_method=posthoc)
     result = adata.uns["rank_genes_groups"]
     groups = result["names"].dtype.names

@@ -13,12 +13,12 @@ def http_get(url: str, verify_ssl: bool = True) -> requests.Response:
     """
     Send a GET request to the specified URL and return the response.
 
-    Args:
-    - url (str): The URL to send the GET request to.
-    - verify_ssl (bool): Whether to verify SSL certificates.
-
-    Returns:
-    - requests.Response: The response from the GET request.
+    :param url: The URL to send the GET request to.
+    :type url: str
+    :param verify_ssl: Whether to verify SSL certificates.
+    :type verify_ssl: bool
+    :return: The response from the GET request.
+    :rtype: requests.Response
     """
     try:
         response = requests.get(url, verify=verify_ssl)
@@ -36,12 +36,12 @@ def fetch_parse(url: str, verify_ssl: bool = True) -> etree._Element:
     """
     Fetch the content of the URL and parse it into an HTML tree.
 
-    Args:
-    - url (str): The URL to fetch.
-    - verify_ssl (bool): Whether to verify SSL certificates.
-
-    Returns:
-    - etree._Element: The parsed HTML tree.
+    :param url: The URL to fetch.
+    :type url: str
+    :param verify_ssl: Whether to verify SSL certificates.
+    :type verify_ssl: bool
+    :return: The parsed HTML tree.
+    :rtype: etree._Element
     """
     response = http_get(url, verify_ssl)
     parser = etree.HTMLParser()
@@ -54,11 +54,10 @@ def get_base_url(url: str) -> str:
     """
     Extract the base URL from the given URL.
 
-    Args:
-    - url (str): The full URL from which to extract the base URL.
-
-    Returns:
-    - str: The base URL.
+    :param url: The full URL from which to extract the base URL.
+    :type url: str
+    :return: The base URL.
+    :rtype: str
     """
     parsed_url = urlparse(url)
     return f"{parsed_url.scheme}://{parsed_url.hostname}"
@@ -68,12 +67,12 @@ def extract_info(tree: etree._ElementTree, xpath: str) -> Optional[str]:
     """
     Helper function to extract information using a given XPath.
 
-    Args:
-    - tree (etree._ElementTree): The parsed HTML tree.
-    - xpath (str): The XPath to extract information.
-
-    Returns:
-    - Optional[str]: Extracted information or None if not found.
+    :param tree: The parsed HTML tree.
+    :type tree: etree._ElementTree
+    :param xpath: The XPath to extract information.
+    :type xpath: str
+    :return: Extracted information or None if not found.
+    :rtype: Optional[str]
     """
     info = tree.xpath(xpath)
     return info[0] if info else None
@@ -83,15 +82,17 @@ def download_file(
     url: str, path_prefix: str = "images", verify_ssl: bool = True
 ) -> str:
     """
-    Download a file from a URL, save it to a StringIO buffer, compute its sha512 value and use it as the filename.
+    Download a file from a URL, save it to a StringIO buffer, compute its sha512
+    value and use it as the filename.
 
-    Args:
-    - url (str): The URL of the file to download.
-    - path_prefix (str): The path prefix for the downloaded file.
-    - verify_ssl (bool): Whether to verify SSL certificates.
-
-    Returns:
-    - str: The filename of the downloaded file.
+    :param url: The URL of the file to download.
+    :type url: str
+    :param path_prefix: The path prefix for the downloaded file.
+    :type path_prefix: str
+    :param verify_ssl: Whether to verify SSL certificates.
+    :type verify_ssl: bool
+    :return: The filename of the downloaded file.
+    :rtype: str
     """
     response = http_get(url, verify_ssl)
 

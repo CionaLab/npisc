@@ -42,14 +42,14 @@ def parse_obo(
     """
     Parses an OBO file to collect terms and their properties.
 
-    Parameters:
-    - filename (str): Path to the OBO file.
-
-    Returns:
-    - Tuple[List[Term], List[Tuple[str, str]], List[Tuple[str, str]]]: A tuple containing three items:
-        1. A list of Term objects.
-        2. A list of tuples representing part_of relationships where each tuple contains a term ID and the ID it is part of.
-        3. A list of tuples representing preceded_by relationships where each tuple contains a term ID and the ID it is preceded by.
+    :param filename: Path to the OBO file.
+    :type filename: str
+    :return: A tuple containing a list of Term objects, a list of tuples
+    representing part_of relationships where each tuple contains a term ID and
+    the ID it is part of, and q list of tuples representing preceded_by
+    relationships where each tuple contains a term ID and the ID it is preceded
+    by.
+    :rtype: Tuple[List[Term], List[Tuple[str, str]], List[Tuple[str, str]]]
     """
     terms = []
 
@@ -136,15 +136,18 @@ def split_terms(
     terms: List[Term], test_func: Callable[[Term], bool]
 ) -> Tuple[List[Term], List[Term]]:
     """
-    Split a list of Term objects based on a test function and separates them into two lists.
+    Split a list of Term objects based on a test function and separates them
+    into two lists.
 
-    Parameters:
-    - terms (List[Term]): The list of Term objects to be sorted.
-    - test_func (Callable[[Term], bool]): The test function that takes a Term object as input and returns a boolean value.
-
-    Returns:
-    - Tuple[List[Term], List[Term]]: A tuple containing two lists of Term objects, where the first list contains terms for which the test function returns True,
-      and the second list contains terms for which the test function returns False.
+    :param terms: The list of Term objects to be sorted.
+    :type terms: List[Term]
+    :param test_func: The test function that takes a Term object as input and
+    returns a boolean value.
+    :type test_func: Callable[[Term], bool]
+    :return: A tuple containing two lists of Term objects, where the first list
+    contains terms for which the test function returns True, and the second list
+    contains terms for which the test function returns False.
+    :rtype: Tuple[List[Term], List[Term]]
     """
     true_terms = []
     false_terms = []
@@ -160,15 +163,16 @@ def split_terms(
 
 def build_graph(filename: str) -> Tuple[nx.DiGraph, nx.DiGraph]:
     """
-    Reads an OBO file and builds directed graphs based on the part_of and preceded_by relationships using networkx.
-    Separates the terms into two different trees based on their ID prefixes.
+    Reads an OBO file and builds directed graphs based on the part_of and
+    preceded_by relationships using networkx. Separates the terms into two
+    different trees based on their ID prefixes.
 
-    Parameters:
-    - filename (str): Path to the OBO file.
-
-    Returns:
-    - Tuple[nx.DiGraph, nx.DiGraph]: Two directed graphs representing the OBO file based on the part_of and preceded_by relationships,
-      where the first graph contains the CirobuA terms and the second graph contains the CirobuD terms.
+    :param filename: Path to the OBO file.
+    :type filename: str
+    :return: Two directed graphs representing the OBO file based on the part_of
+    and preceded_by relationships, where the first graph contains the CirobuA
+    terms and the second graph contains the CirobuD terms.
+    :rtype: Tuple[nx.DiGraph, nx.DiGraph]
     """
     terms, part_of, preceded_by = parse_obo(filename)
 
@@ -205,11 +209,11 @@ def get_linked_lists(graph: nx.DiGraph) -> List[List[Tuple[str, str]]]:
     """
     Returns a list of linked lists in the given directed graph.
 
-    Parameters:
-    - graph (nx.DiGraph): The directed graph.
-
-    Returns:
-    - List[List[Tuple[str, str]]]: A list of linked lists, where each linked list is represented as a list of tuples containing the node id and name in the order of appearance.
+    :param graph: The directed graph.
+    :type graph: nx.DiGraph
+    :return: A list of linked lists, where each linked list is represented as a
+    list of tuples containing the node id and name in the order of appearance.
+    :rtype: List[List[Tuple[str, str]]]
     """
 
     tree = nx.reverse(graph, copy=True)
@@ -241,12 +245,12 @@ def find_leaves(tree: nx.DiGraph, node: str) -> List[str]:
     """
     Recursively search for all leaves under a specific node in a tree.
 
-    Parameters:
-    - tree (nx.DiGraph): The tree to search.
-    - node (str): The starting node.
-
-    Returns:
-    - List[str]: A list of all leaves found under the given node.
+    :param tree: The tree to search.
+    :type tree: nx.DiGraph
+    :param node: The starting node.
+    :type node: str
+    :return: A list of all leaves found under the given node.
+    :rtype: List[str]
     """
     # If this node has no successors, it is a leaf.
     if tree.out_degree(node) == 0:
@@ -264,12 +268,12 @@ def node_to_leaves(graph: nx.DiGraph) -> Dict[str, List[str]]:
     Constructs a dictionary mapping from nodes to the list of leaves under them in the tree.
     Assumes that the graph represents a tree structure.
 
-    Parameters:
-    - graph (nx.DiGraph): The directed graph that needs to be processed.
-    - node_attr (str): The node attribute used to fetch the node's name.
-
-    Returns:
-    - Dict[str, List[str]]: A dictionary mapping each node to a list of its leaves.
+    :param graph: The directed graph that needs to be processed.
+    :type graph: nx.DiGraph
+    :param node_attr: The node attribute used to fetch the node's name.
+    :type node_attr: str
+    :return: A dictionary mapping each node to a list of its leaves.
+    :rtype: Dict[str, List[str]]
     """
     # First, we reverse the graph to make it a tree (parent -> children).
     tree = nx.reverse(graph, copy=True)
@@ -288,12 +292,13 @@ def group_leaves_by_time(
     """
     Groups the leaves in the given dictionary by their start and end nodes.
 
-    Parameters:
-    - graph (nx.DiGraph): The directed graph representing the ontology.
-    - leaves (Dict[str, List[str]]): A dictionary mapping each node to a list of its leaves.
-
-    Returns:
-    - Dict[Tuple[str, str, str], List[str]]: A dictionary with (id, start, end) as key and a list of leaf ids as value.
+    :param graph: The directed graph representing the ontology.
+    :type graph: nx.DiGraph
+    :param leaves: A dictionary mapping each node to a list of its leaves.
+    :type leaves: Dict[str, List[str]]
+    :return: A dictionary with (id, start, end) as key and a list of leaf ids as
+    value.
+    :rtype: Dict[Tuple[str, str, str], List[str]]
     """
 
     results = defaultdict(list)
@@ -313,12 +318,12 @@ def get_node_name(graph: nx.DiGraph, node: str) -> Optional[str]:
     """
     Finds the name of a node in the graph based on its ID.
 
-    Parameters:
-    - graph (nx.DiGraph): The directed graph.
-    - node (str): The ID of the node to find.
-
-    Returns:
-    - Optional[str]: The name of the node if found, None otherwise.
+    :param graph: The directed graph.
+    :type graph: nx.DiGraph
+    :param node: The ID of the node to find.
+    :type node: str
+    :return: The name of the node if found, None otherwise.
+    :rtype: Optional[str]
     """
     return graph.nodes[node].get("name")
 
@@ -327,11 +332,10 @@ def parse_url(url: str) -> dict:
     """
     Parses the given URL and returns a dictionary of its parameters.
 
-    Parameters:
-    - url (str): The URL to parse.
-
-    Returns:
-    - dict: A dictionary containing the parsed parameters.
+    :param url: The URL to parse.
+    :type url: str
+    :return: A dictionary containing the parsed parameters.
+    :rtype: dict
     """
     parsed_url = urlparse(url)
     query_params = parse_qs(parsed_url.query)
@@ -342,9 +346,11 @@ def write_to_csv(data: Dict[str, List[str]], filename: str) -> None:
     """
     Writes the provided dictionary to a CSV file.
 
-    Parameters:
-    - data (Dict[str, List[str]]): The dictionary to write. Keys are strings, and values are lists of strings.
-    - filename (str): The name of the output CSV file.
+    :param data: The dictionary to write. Keys are strings, and values are lists
+    of strings.
+    :type data: Dict[str, List[str]]
+    :param filename: The name of the output CSV file.
+    :type filename: str
     """
     with open(filename, "w", newline="") as csvfile:
         writer = csv.writer(csvfile)

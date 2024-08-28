@@ -16,7 +16,8 @@ def scrape_page(url: str, verify_ssl: bool = True) -> Tuple[List[str], Optional[
     - verify_ssl (bool): Whether to verify SSL certificates.
 
     Returns:
-    - Tuple[List[str], Optional[str]]: A tuple containing a list of article links and the URL of the next page (if available).
+    - Tuple[List[str], Optional[str]]: A tuple containing a list of article
+    links and the URL of the next page (if available).
     """
     tree = fetch_parse(url, verify_ssl)
 

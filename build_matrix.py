@@ -19,19 +19,25 @@ def preprocess_tsv(
 ) -> pd.DataFrame:
     """
     Reads a TSV file and preprocesses it by extracting relevant information.
-    It also maps the KH2012 gene model to the KY21 gene model using a provided mapping file.
-    Uses ontology information from OBO file to map territories to underlying blastomeres.
+    It also maps the KH2012 gene model to the KY21 gene model using a provided
+    mapping file.
 
-    The function extracts the stage in parentheses, the KH number, and the expression territory
-    (cell) from the TSV rows. Columns with NaN values are dropped.
+    Uses ontology information from OBO file to map territories to underlying
+    blastomeres.
 
-    Parameters:
-    - filepath (str): Path to the TSV file.
-    - mapping_filepath (str): Path to the TSV file containing the mapping between KH2012 and KY21.
-    - obo_filepath (str): Path to the OBO file.
+    The function extracts the stage in parentheses, the KH number, and the
+    expression territory (cell) from the TSV rows. Columns with NaN values are
+    dropped.
 
-    Returns:
-    - pd.DataFrame: A preprocessed DataFrame.
+    :param filepath: Path to the TSV file.
+    :type filepath: str
+    :param mapping_filepath: Path to the TSV file containing the mapping between
+    KH2012 and KY21.
+    :type mapping_filepath: str
+    :param obo_filepath: Path to the OBO file.
+    :type obo_filepath: str
+    :return: A preprocessed DataFrame.
+    :rtype: pd.DataFrame
     """
 
     # Build graph from OBO file
@@ -80,15 +86,17 @@ def build_from_df(df: pd.DataFrame) -> pd.DataFrame:
     Converts a DataFrame containing an adjacency list into an adjacency matrix.
 
     The DataFrame should have columns: Stage, Gene, and Territory.
-    The returned adjacency matrix has cells in rows and genes in columns, indicating
-    gene expression in the respective cells. If multiple edges exist between the same
-    vertices in the adjacency list, they are considered as a single edge in the matrix.
+    The returned adjacency matrix has cells in rows and genes in columns,
+    indicating
+    gene expression in the respective cells. If multiple edges exist between the
+    same
+    vertices in the adjacency list, they are considered as a single edge in the
+    matrix.
 
-    Parameters:
-    - df (pd.DataFrame): A DataFrame containing the adjacency list.
-
-    Returns:
-    - pd.DataFrame: An adjacency matrix with cells in rows and genes in columns.
+    :param df: A DataFrame containing the adjacency list.
+    :type df: pd.DataFrame
+    :return: An adjacency matrix with cells in rows and genes in columns.
+    :rtype: pd.DataFrame
     """
 
     # Create the adjacency matrix using pivot_table
@@ -107,12 +115,12 @@ def append_raw(adata: anndata.AnnData, adata_raw: anndata.AnnData) -> anndata.An
     """
     Append the observation data to raw data.
 
-    Parameters:
-    - adata (anndata.AnnData): The AnnData object to append the raw data to.
-    - adata_raw (anndata.AnnData): The AnnData object containing the raw data to append.
-
-    Returns:
-    - anndata.AnnData: The AnnData object with the raw data appended.
+    :param adata: The AnnData object to append the raw data to.
+    :type adata: anndata.AnnData
+    :param adata_raw: The AnnData object containing the raw data to append.
+    :type adata_raw: anndata.AnnData
+    :return: The AnnData object with the raw data appended.
+    :rtype: anndata.AnnData
     """
 
     adata_raw.obs = adata_raw.obs.merge(
@@ -130,11 +138,10 @@ def to_df(obj: Union[anndata.AnnData, pd.DataFrame]) -> pd.DataFrame:
     """
     Convert an AnnData or DataFrame to a DataFrame.
 
-    Parameters:
-    - obj (Union[anndata.AnnData, pd.DataFrame]): The object to convert.
-
-    Returns:
-    - pd.DataFrame: The converted DataFrame.
+    :param obj: The object to convert.
+    :type obj: Union[anndata.AnnData, pd.DataFrame]
+    :return: The converted DataFrame.
+    :rtype: pd.DataFrame
     """
     if isinstance(obj, anndata.AnnData):
         if issparse(obj.X):
@@ -151,12 +158,12 @@ def to_obj(
     """
     Convert a DataFrame back to its original type (either AnnData or DataFrame).
 
-    Parameters:
-    - obj (Union[anndata.AnnData, pd.DataFrame]): The original object.
-    - df (pd.DataFrame): The DataFrame to convert.
-
-    Returns:
-    - Union[anndata.AnnData, pd.DataFrame]: The converted object.
+    :param obj: The original object.
+    :type obj: Union[anndata.AnnData, pd.DataFrame]
+    :param df: The DataFrame to convert.
+    :type df: pd.DataFrame
+    :return: The converted object.
+    :rtype: Union[anndata.AnnData, pd.DataFrame]
     """
     if isinstance(obj, anndata.AnnData):
         return anndata.AnnData(
@@ -172,16 +179,15 @@ def pad_compatible(
     obj2: Union[anndata.AnnData, pd.DataFrame],
 ) -> Tuple[Union[anndata.AnnData, pd.DataFrame], Union[anndata.AnnData, pd.DataFrame]]:
     """
-    Adjust both input objects (either AnnData or DataFrame) to have the same columns.
+    Adjust both input objects (either AnnData or DataFrame) to have the same
+    columns.
 
-    Parameters:
-    - obj1 (Union[anndata.AnnData, pd.DataFrame]): First object
-    (either AnnData or DataFrame).
-    - obj2 (Union[anndata.AnnData, pd.DataFrame]): Second object
-    (either AnnData or DataFrame).
-
-    Returns:
-    - tuple: Tuple containing the adjusted objects.
+    :param obj1: First object (either AnnData or DataFrame).
+    :type obj1: Union[anndata.AnnData, pd.DataFrame]
+    :param obj2: Second object (either AnnData or DataFrame).
+    :type obj2: Union[anndata.AnnData, pd.DataFrame]
+    :return: Tuple containing the adjusted objects.
+    :rtype: tuple
     """
 
     df1 = to_df(obj1)
@@ -206,14 +212,14 @@ def split_adata(adata: anndata.AnnData, col: str) -> Dict[str, anndata.AnnData]:
     Splits an AnnData object into a dictionary of AnnData objects based on a
     column in adata.obs.
 
-    Parameters:
-    - adata (anndata.AnnData): Input AnnData object.
-    - col (str): The column name in adata.obs based on which the splitting
-    should be done.
-
-    Returns:
-    - Dict[str, anndata.AnnData]: Dictionary with unique values from the column
-    as keys and respective sub-AnnData objects as values.
+    :param adata: Input AnnData object.
+    :type adata: anndata.AnnData
+    :param col: The column name in adata.obs based on which the splitting should
+    be done.
+    :type col: str
+    :return: Dictionary with unique values from the column as keys and
+    respective sub-AnnData objects as values.
+    :rtype: Dict[str, anndata.AnnData]
     """
 
     return {value: adata[adata.obs[col] == value] for value in adata.obs[col].unique()}
@@ -228,15 +234,14 @@ def get_distance(
     Compute the distance between two objects (either AnnData or DataFrame) using
     the specified metric.
 
-    Parameters:
-    - obj1 (Union[anndata.AnnData, pd.DataFrame]): The first object
-    (either AnnData or DataFrame).
-    - obj2 (Union[anndata.AnnData, pd.DataFrame]): The second object
-    (either AnnData or DataFrame).
-    - metric (str, optional): The distance metric to use. Defaults to "euclidean".
-
-    Returns:
-    - pd.DataFrame: A dataframe of distance values between the two objects.
+    :param obj1: The first object (either AnnData or DataFrame).
+    :type obj1: Union[anndata.AnnData, pd.DataFrame]
+    :param obj2: The second object (either AnnData or DataFrame).
+    :type obj2: Union[anndata.AnnData, pd.DataFrame]
+    :param metric: The distance metric to use. Defaults to "euclidean".
+    :type metric: str, optional
+    :return: A dataframe of distance values between the two objects.
+    :rtype: pd.DataFrame
     """
 
     df1 = to_df(obj1)
@@ -260,17 +265,17 @@ def get_distance(
 
     return similarity_df
 
+
 def adjacent(iterable: Iterable, n: int = 2) -> Iterable[Tuple[Iterable, ...]]:
     """
     Return n-tuples of adjacent elements from the input iterable.
 
-    Parameters:
-    - iterable (Iterable): Input iterable.
-    - n (int): The number of elements in each tuple.
-
-    Returns:
-    - Iterable[Tuple[Iterable, ...]]: Iterable producing n-tuples of adjacent
-    elements.
+    :param iterable: Input iterable.
+    :type iterable: Iterable
+    :param n: The number of elements in each tuple.
+    :type n: int
+    :return: Iterable producing n-tuples of adjacent elements.
+    :rtype: Iterable[Tuple[Iterable, ...]]
     """
     iterators = tee(iterable, n)
     for i, iterator in enumerate(iterators):
@@ -284,12 +289,10 @@ def parse_territory(territory: str) -> Tuple[str, int, str]:
     Parse the territory string into its components: cell lineage, rounds of
     division, and cell number.
 
-    Parameters:
-    - territory (str): The territory string, e.g., "A9.32".
-
-    Returns:
-    - Tuple[str, int, str]: A tuple with cell lineage, rounds of division, and
-    cell number.
+    :param territory: The territory string, e.g., "A9.32".
+    :type territory: str
+    :return: A tuple with cell lineage, rounds of division, and cell number.
+    :rtype: tuple[str, int, str]
     """
     match = re.match(r"^([ABab])(\d+)\.(\d+\**)$", territory)
     if match:
