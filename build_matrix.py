@@ -6,11 +6,15 @@ from typing import Dict, Union, Tuple, Iterable, Callable
 from itertools import tee
 import re
 
+import numpy as np
 from scipy.sparse import issparse
 import pandas as pd
 import anndata
 import scanpy as sc
 from sklearn.metrics import pairwise_distances
+import matplotlib.pyplot as plt
+import matplotlib.axes
+import geopandas as gpd
 
 from .ontology import build_graph, node_to_leaves
 
@@ -300,3 +304,86 @@ def parse_territory(territory: str) -> Tuple[str, int, str]:
         lineage, rounds, cell_num = match.groups()
         return lineage, int(rounds), cell_num
     return None, None, None
+
+
+def map_cells(
+    adata: anndata.AnnData, pattern: np.ndarray
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """
+    Maps scRNAseq cells to blastomeres using a given pattern.
+
+    :param adata: Annotated data matrix.
+    :type adata: anndata.AnnData
+    :param pattern: Pattern to be used for mapping.
+    :type pattern: np.ndarray
+
+    :return: A tuple with a dataframe with the cosine similarity of individual scRNAseq cells,
+             a dataframe with the mean cosine similarity of each Leiden cluster,
+             and the most similar blastomere for each Leiden cluster.
+    :rtype: tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]
+    """
+
+    pattern, adata = pad_compatible(pattern, adata)
+    sc.pp.normalize_total(adata, target_sum=1e4)
+    sc.pp.log1p(adata)
+    sc.tl.pca(adata, svd_solver="arpack")
+
+    df_cells = 1 - get_distance(
+        pattern @ adata.varm["PCs"],
+        pd.DataFrame(adata.obsm["X_pca"], index=adata.obs_names),
+        "cosine",
+    )
+
+    df_leiden = (
+        df_cells.T.join(adata.obs["leiden"], how="left").groupby("leiden").mean()
+    )
+
+    df_map = pd.DataFrame(
+        {"cluster": df_leiden.idxmax(axis=0), "cos_theta": df_leiden.max(axis=0)}
+    )
+
+    return df_cells, df_leiden, df_map
+
+
+def plot_np(df: pd.DataFrame, gdf: gpd.GeoDataFrame, l: int) -> matplotlib.axes.Axes:
+    """
+    Plot the most similar Leiden cluster on a blastomere map.
+
+    :param df: The DataFrame containing the Leiden cluster and the most similar
+    blastomere.
+    :type df: pd.DataFrame
+    :param gdf: The GeoDataFrame containing the blastomere map.
+    :type gdf: gpd.GeoDataFrame
+    :param l: The height of the plot in inches.
+    :type l: int
+    :return: The axes object representing the plot.
+    :rtype: matplotlib.axes.Axes
+    """
+
+    gdf = gdf.merge(df, left_on="name", right_index=True)
+    fig, ax = plt.subplots(1, 1)
+    gdf.plot(
+        column="cos_theta",
+        cmap="rocket",
+        ax=ax,
+        linewidth=0.8,
+        edgecolor="0.8",
+        legend=True,
+        legend_kwds={"shrink": 0.3},
+        vmax=0.7,
+        vmin=0.1,
+    )
+    gdf.apply(
+        lambda x: ax.annotate(
+            text=f"{x['name']}\n{x['cluster']}",
+            xy=x.geometry.centroid.coords[0],
+            ha="center",
+            color="white",
+            fontsize=12,
+        ),
+        axis=1,
+    )
+    fig.set_size_inches(6, l)
+    ax.axis("off")
+
+    return ax
