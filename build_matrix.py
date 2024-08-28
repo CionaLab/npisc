@@ -9,9 +9,10 @@ import re
 from scipy.sparse import issparse
 import pandas as pd
 import anndata
+import scanpy as sc
 from sklearn.metrics import pairwise_distances
 
-from ontology import build_graph, node_to_leaves
+from .ontology import build_graph, node_to_leaves
 
 
 def preprocess_tsv(

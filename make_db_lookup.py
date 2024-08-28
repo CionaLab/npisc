@@ -8,7 +8,7 @@ from collections import defaultdict
 import networkx as nx
 from networkx.algorithms.traversal.breadth_first_search import bfs_tree
 
-from ontology import (
+from .ontology import (
     build_graph,
     node_to_leaves,
     get_node_name,

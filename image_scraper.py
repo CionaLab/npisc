@@ -7,7 +7,7 @@ from urllib.parse import urljoin
 
 from requests import HTTPError
 
-from scraper import fetch_parse, download_file, get_base_url
+from .scraper import fetch_parse, download_file, get_base_url
 
 XPATH_IMAGE = '//div[contains(@class, "content_yellow")]/div/div[@id="picture_description"]/div[contains(@class, "mini_picture")]/a/@href'
 

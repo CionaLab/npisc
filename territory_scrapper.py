@@ -4,7 +4,7 @@ import sys
 import time
 from typing import List, Tuple, Optional
 
-from scraper import extract_info, fetch_parse
+from .scraper import extract_info, fetch_parse
 
 
 def get_expression_info(
