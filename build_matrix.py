@@ -387,3 +387,99 @@ def plot_np(df: pd.DataFrame, gdf: gpd.GeoDataFrame, l: int) -> matplotlib.axes.
     ax.axis("off")
 
     return ax
+
+
+def pca_raw(
+    adata: anndata.AnnData, target_sum: float = 1e4, svd_solver: str = "arpack"
+) -> anndata.AnnData:
+    """
+    Preprocesses the raw AnnData object by normalizing the total counts,
+    applying logarithmic transformation, and performing principal component
+    analysis (PCA).
+
+    :param adata: The input AnnData object.
+    :type adata: anndata.AnnData
+    :param target_sum: The target sum of counts after normalization, defaults to
+    1e4.
+    :type target_sum: float, optional
+    :param svd_solver: The solver to use for PCA, defaults to "arpack".
+    :type svd_solver: str, optional
+    :return: The preprocessed AnnData object.
+    :rtype: anndata.AnnData
+    """
+
+    sc.pp.normalize_total(adata, target_sum=target_sum)
+    sc.pp.log1p(adata)
+    sc.tl.pca(adata, svd_solver=svd_solver)
+    return adata
+
+
+def round_trip_distance(
+    adata1: anndata.AnnData, adata2: anndata.AnnData, name1: str, name2: str
+) -> pd.DataFrame:
+    """
+    Calculate the round trip distance between two AnnData objects.
+
+    :param adata1: The first AnnData object.
+    :type adata1: AnnData
+    :param adata2: The second AnnData object.
+    :type adata2: AnnData
+    :param name1: The name of the second AnnData object.
+    :type name1: str
+    :param name2: The name of the second AnnData object.
+    :type name2: str
+
+    :return: The round trip distance matrix.
+    :rtype: pd.DataFrame
+    """
+
+    t1 = get_distance(
+        pd.DataFrame(adata1.X @ adata2.varm["PCs"], index=adata1.obs_names),
+        pd.DataFrame(adata2.obsm["X_pca"], index=adata2.obs_names),
+        "cosine",
+    )
+
+    t2 = get_distance(
+        pd.DataFrame(adata2.X @ adata1.varm["PCs"], index=adata2.obs_names),
+        pd.DataFrame(adata1.obsm["X_pca"], index=adata1.obs_names),
+        "cosine",
+    )
+
+    d1 = (
+        t1.melt(ignore_index=False, var_name="target", value_name="cos_theta")
+        .reset_index(names="source")
+        .merge(adata1.obs["leiden"], left_on=["source"], right_index=True)
+        .merge(
+            adata2.obs["leiden"],
+            left_on=["target"],
+            right_index=True,
+            suffixes=(f"_{name1}", f"_{name2}"),
+        )
+        .groupby([f"leiden_{name1}", f"leiden_{name2}"])["cos_theta"]
+        .mean()
+        .reset_index()
+    )
+
+    d2 = (
+        t2.melt(ignore_index=False, var_name="target", value_name="cos_theta")
+        .reset_index(names="source")
+        .merge(adata2.obs["leiden"], left_on=["source"], right_index=True)
+        .merge(
+            adata1.obs["leiden"],
+            left_on=["target"],
+            right_index=True,
+            suffixes=(f"_{name2}", f"_{name1}"),
+        )
+        .groupby([f"leiden_{name2}", f"leiden_{name1}"])["cos_theta"]
+        .mean()
+        .reset_index()
+    )
+
+    d3 = d1.pivot(
+        index=f"leiden_{name1}", columns=f"leiden_{name2}", values="cos_theta"
+    )
+    d4 = d2.pivot(
+        index=f"leiden_{name2}", columns=f"leiden_{name1}", values="cos_theta"
+    )
+
+    return d3 + d4.T
