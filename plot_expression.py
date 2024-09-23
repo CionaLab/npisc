@@ -25,6 +25,9 @@ df = pd.read_csv("pass_02.tsv", sep="\t")
 
 gdfs = {stage: gpd.read_file(file) for stage, file, _ in STAGES}
 
+for stage in gdfs:
+    gdfs[stage]["name"] = gdfs[stage]["name"].str.replace("*", "", regex=False)
+
 # %%
 df["Stage"] = df["Stage"].apply(lambda x: (" ".join(re.findall(PATTERN_STAGES, x)[0])))
 df = df[df["Territory_eq"].str.contains(PATTERN_CELLS)]
@@ -49,18 +52,29 @@ merged_dfs = {
 }
 
 # %%
-for k, _, l in STAGES:
+
+fig, axs = plt.subplots(nrows=1, ncols=len(STAGES), figsize=(8, 4), sharey="all")
+
+for a, (k, _, l) in zip(axs, STAGES):
     v = merged_dfs[k]
-    fig, ax = plt.subplots(1, 1)
-    v.plot(column="n", ax=ax, cmap="cool", linewidth=0.8, edgecolor="0.8")
-    v.apply(
-        lambda x: ax.annotate(
-            text=x["name"], xy=x.geometry.centroid.coords[0], ha="center"
-        ),
-        axis=1,
+    v.plot(
+        column="n",
+        ax=a,
+        linewidth=0.8,
+        categorical=False,
+        vmin=1,
+        vmax=20,
+        missing_kwds={"color": "lightgrey"},
+        cmap=sns.color_palette("rocket", as_cmap=True),
     )
-    fig.set_size_inches(4, l)
-    plt.show()
+    a.axis("off")
+    a.set_title(k)
+
+patch_col = axs[0].collections[0]
+
+plt.tight_layout()
+plt.colorbar(patch_col, ax=axs, shrink=0.5)
+plt.savefig("marker_map.png", dpi=300)
 
 # %%
 pattern_dfs = {
