@@ -1,6 +1,7 @@
 # %%
 import re
 
+import numpy as np
 import pandas as pd
 import geopandas as gpd
 from sklearn.metrics import pairwise_distances
@@ -53,7 +54,9 @@ merged_dfs = {
 
 # %%
 
-fig, axs = plt.subplots(nrows=1, ncols=len(STAGES), figsize=(8, 4), sharey="all")
+fig, axs = plt.subplots(
+    nrows=1, ncols=len(STAGES), figsize=(8, 4), sharey="all", dpi=300
+)
 
 for a, (k, _, l) in zip(axs, STAGES):
     v = merged_dfs[k]
@@ -72,9 +75,9 @@ for a, (k, _, l) in zip(axs, STAGES):
 
 patch_col = axs[0].collections[0]
 
-plt.tight_layout()
-plt.colorbar(patch_col, ax=axs, shrink=0.5)
-plt.savefig("marker_map.png", dpi=300)
+fig.tight_layout()
+fig.colorbar(patch_col, ax=axs, shrink=0.5)
+fig.savefig("marker_map.png")
 
 # %%
 pattern_dfs = {
@@ -100,20 +103,22 @@ jaccard_dfs = {
 }
 
 # %%
-for stage, _, _ in STAGES:
+
+WIDTH = [3, 3, 2, 2, 2]
+
+for (stage, _, _), w in zip(STAGES, WIDTH):
+    plt.figure(figsize=(w, 2), dpi=300)
     pattern_df = pattern_dfs[stage]
-    jaccard_df = jaccard_dfs[stage]
+    print(np.linalg.matrix_rank(pattern_df))
+    print(pattern_df.shape)
 
-    g = sns.clustermap(pattern_df, cmap="cool")
-    g.figure.suptitle(f"Pattern Heatmap for {stage}")
-    g.figure.subplots_adjust(top=0.95, right=0.8)
-    g.ax_cbar.set_position((0.9, 0.2, 0.03, 0.4))
-
-    g = sns.clustermap(jaccard_df, method="complete", metric="jaccard", cmap="cool")
-    g.figure.suptitle(f"Jaccard Distance Heatmap for {stage}")
-    g.figure.subplots_adjust(top=0.95, right=0.8)
-    g.ax_cbar.set_position((0.9, 0.2, 0.03, 0.4))
-
-    plt.show()
+    plt.spy(pattern_df)
+    plt.xlabel("Genes")
+    plt.ylabel("Blastomeres")
+    plt.xticks([])
+    plt.yticks([])
+    plt.title(stage)
+    plt.tight_layout()
+    plt.savefig(f"marker_{stage.replace(" ", "_")}.png")
 
 # %%
