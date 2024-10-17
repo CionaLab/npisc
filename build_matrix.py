@@ -12,9 +12,9 @@ import pandas as pd
 import anndata
 import scanpy as sc
 from sklearn.metrics import pairwise_distances
-import matplotlib.pyplot as plt
 import matplotlib.axes
 import geopandas as gpd
+import seaborn as sns
 
 from .ontology import build_graph, node_to_leaves
 
@@ -345,45 +345,44 @@ def map_cells(
     return df_cells, df_leiden, df_map
 
 
-def plot_np(df: pd.DataFrame, gdf: gpd.GeoDataFrame, l: int) -> matplotlib.axes.Axes:
+def plot_np(
+    df: pd.DataFrame,
+    gdf: gpd.GeoDataFrame,
+    ax: matplotlib.axes.Axes,
+    gpd_kwds: dict,
+    anno_kwds: dict,
+) -> matplotlib.axes.Axes:
     """
-    Plot the most similar Leiden cluster on a blastomere map.
+    Plot the most similar Leiden cluster on a blastomere map. The merged
+    dataframe should have a cluster column for annotation.
 
     :param df: The DataFrame containing the Leiden cluster and the most similar
     blastomere.
     :type df: pd.DataFrame
     :param gdf: The GeoDataFrame containing the blastomere map.
     :type gdf: gpd.GeoDataFrame
-    :param l: The height of the plot in inches.
-    :type l: int
+    :param ax: The Axes for the plot.
+    :type ax: matplotlib.axes.Axes
+    :param gpd_kwds: Keyword arguments to pass to the GeoDataFrame plot function.
+        It should contain the column name to use for coloring.
+    :type gpd_kwds: dict
+    :param anno_kwds: Keyword arguments to pass to the annotate function.
+    :type anno_kwds: dict
     :return: The axes object representing the plot.
     :rtype: matplotlib.axes.Axes
     """
 
-    gdf = gdf.merge(df, left_on="name", right_index=True)
-    fig, ax = plt.subplots(1, 1)
-    gdf.plot(
-        column="cos_theta",
-        cmap="rocket",
-        ax=ax,
-        linewidth=0.8,
-        edgecolor="0.8",
-        legend=True,
-        legend_kwds={"shrink": 0.3},
-        vmax=0.7,
-        vmin=0.1,
-    )
+    gdf = gdf.merge(df, left_on="name", right_index=True, how="left")
+    gdf.plot(ax=ax, **gpd_kwds)
     gdf.apply(
         lambda x: ax.annotate(
-            text=f"{x['name']}\n{x['cluster']}",
+            text=f"{x['cluster']}",
             xy=x.geometry.centroid.coords[0],
             ha="center",
-            color="white",
-            fontsize=12,
+            **anno_kwds,
         ),
         axis=1,
     )
-    fig.set_size_inches(6, l)
     ax.axis("off")
 
     return ax
