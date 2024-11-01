@@ -55,7 +55,7 @@ merged_dfs = {
 # %%
 
 fig, axs = plt.subplots(
-    nrows=1, ncols=len(STAGES), figsize=(8, 4), sharey="all", dpi=300
+    nrows=1, ncols=len(STAGES), figsize=(6.5, 2), sharey="all", dpi=300
 )
 
 for a, (k, _, l) in zip(axs, STAGES):
@@ -71,7 +71,7 @@ for a, (k, _, l) in zip(axs, STAGES):
         cmap=sns.color_palette("rocket", as_cmap=True),
     )
     a.axis("off")
-    a.set_title(k)
+    a.set_title(k, fontsize=10)
 
 patch_col = axs[0].collections[0]
 
