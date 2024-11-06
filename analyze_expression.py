@@ -17,6 +17,7 @@ def diff_expression(
     groupby: str = "leiden",
     method: Method = "t-test",
     posthoc: PostHoc = "benjamini-hochberg",
+    layer: str = None,
     top: int = 50,
     alpha: float = 0.05,
 ) -> pd.DataFrame:
@@ -26,27 +27,37 @@ def diff_expression(
     :param adata: The AnnData object containing the expression data.
     :type adata: anndata.AnnData
     :param groupby: The column name in `adata.obs` that contains the cluster
-    labels. Default is "leiden".
+        labels. Default is "leiden".
     :type groupby: str, optional
     :param method: The statistical method to use for differential expression
-    analysis. Default is "t-test".
+        analysis. Default is "t-test".
     :type method: Method, optional
     :param posthoc: The post-hoc correction method to use. Default is
-    "benjamini-hochberg".
+        "benjamini-hochberg".
     :type posthoc: PostHoc, optional
+    :param layer: The layer in `adata` to use for differential expression.
+    :type layer: str, optional
     :param top: The number of top differentially expressed genes to select for
-    each cluster. Default is 50.
+        each cluster. Default is 50.
     :type top: int, optional
     :param alpha: The significance level for determining differential
-    expression. Default is 0.05.
+        expression. Default is 0.05.
     :type alpha: float, optional
-
     :return: A dataframe containing the differentially expressed genes for each
-    cluster, sorted by log-fold change.
+        cluster, sorted by log-fold change.
     :rtype: pd.DataFrame
     """
 
-    sc.tl.rank_genes_groups(adata, groupby, method=method, corr_method=posthoc)
+    use_raw = (layer is None) and (adata.raw is not None)
+
+    sc.tl.rank_genes_groups(
+        adata,
+        groupby,
+        use_raw=use_raw,
+        method=method,
+        corr_method=posthoc,
+        layer=layer,
+    )
     result = adata.uns["rank_genes_groups"]
     groups = result["names"].dtype.names
 

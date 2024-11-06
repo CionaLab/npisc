@@ -2,19 +2,16 @@
 This module contains functions for analyzing gene expression data.
 """
 
-from typing import Dict, Union, Tuple, Iterable, Callable
+from typing import Dict, Tuple, Iterable, Callable
 from itertools import tee
 import re
 
 import numpy as np
-from scipy.sparse import issparse
 import pandas as pd
 import anndata
-import scanpy as sc
 from sklearn.metrics import pairwise_distances
 import matplotlib.axes
 import geopandas as gpd
-import seaborn as sns
 
 from .ontology import build_graph, node_to_leaves
 
@@ -37,7 +34,7 @@ def preprocess_tsv(
     :param filepath: Path to the TSV file.
     :type filepath: str
     :param mapping_filepath: Path to the TSV file containing the mapping between
-    KH2012 and KY21.
+        KH2012 and KY21.
     :type mapping_filepath: str
     :param obo_filepath: Path to the OBO file.
     :type obo_filepath: str
@@ -90,11 +87,9 @@ def build_from_df(df: pd.DataFrame) -> pd.DataFrame:
     """
     Converts a DataFrame containing an adjacency list into an adjacency matrix.
 
-    The DataFrame should have columns: Stage, Gene, and Territory.
-    The returned adjacency matrix has cells in rows and genes in columns,
-    indicating
-    gene expression in the respective cells. If multiple edges exist between the
-    same
+    The DataFrame should have columns: Stage, Gene, and Territory.  The returned
+    adjacency matrix has cells in rows and genes in columns, indicating gene
+    expression in the respective cells. If multiple edges exist between the same
     vertices in the adjacency list, they are considered as a single edge in the
     matrix.
 
@@ -116,87 +111,43 @@ def build_from_df(df: pd.DataFrame) -> pd.DataFrame:
     return mat
 
 
-def append_raw(adata: anndata.AnnData, adata_raw: anndata.AnnData) -> anndata.AnnData:
+def pad_df_adata(
+    df: pd.DataFrame,
+    adata: anndata.AnnData,
+) -> pd.DataFrame:
     """
-    Append the observation data to raw data.
+    Adjust the DataFrame to have the same columns by padding the missing columns
+    with zeros and removing the extra columns.
 
-    :param adata: The AnnData object to append the raw data to.
-    :type adata: anndata.AnnData
-    :param adata_raw: The AnnData object containing the raw data to append.
-    :type adata_raw: anndata.AnnData
-    :return: The AnnData object with the raw data appended.
-    :rtype: anndata.AnnData
-    """
-
-    adata_raw.obs = adata_raw.obs.merge(
-        adata.obs,
-        how="left",
-        left_index=True,
-        right_index=True,
-        suffixes=("_raw", None),
-    )
-
-    return adata_raw
-
-
-def to_df(obj: Union[anndata.AnnData, pd.DataFrame]) -> pd.DataFrame:
-    """
-    Convert an AnnData or DataFrame to a DataFrame.
-
-    :param obj: The object to convert.
-    :type obj: Union[anndata.AnnData, pd.DataFrame]
-    :return: The converted DataFrame.
+    :param df: The dataframe to be adjusted.
+    :type df: pd.DataFrame
+    :param adata: The reference AnnData object.
+    :type df2: annadata.AnnData
+    :return: the adjusted DataFrames.
     :rtype: pd.DataFrame
     """
-    if isinstance(obj, anndata.AnnData):
-        if issparse(obj.X):
-            return pd.DataFrame(
-                obj.X.toarray(), columns=obj.var_names, index=obj.obs_names
-            )
-        return pd.DataFrame(obj.X, columns=obj.var_names, index=obj.obs_names)
-    return obj
+
+    # Reindex dataframes with all_cols and fill missing values with zeros
+    df = df.reindex(columns=adata.var_names, fill_value=0)
+
+    return df
 
 
-def to_obj(
-    obj: Union[anndata.AnnData, pd.DataFrame], df: pd.DataFrame
-) -> Union[anndata.AnnData, pd.DataFrame]:
+def pad_dfs(
+    df1: pd.DataFrame,
+    df2: pd.DataFrame,
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Convert a DataFrame back to its original type (either AnnData or DataFrame).
-
-    :param obj: The original object.
-    :type obj: Union[anndata.AnnData, pd.DataFrame]
-    :param df: The DataFrame to convert.
-    :type df: pd.DataFrame
-    :return: The converted object.
-    :rtype: Union[anndata.AnnData, pd.DataFrame]
-    """
-    if isinstance(obj, anndata.AnnData):
-        return anndata.AnnData(
-            X=df.values, var=pd.DataFrame(index=df.columns), obs=obj.obs, uns=obj.uns
-        )
-    if isinstance(obj, pd.DataFrame):
-        return df
-    return None
-
-
-def pad_compatible(
-    obj1: Union[anndata.AnnData, pd.DataFrame],
-    obj2: Union[anndata.AnnData, pd.DataFrame],
-) -> Tuple[Union[anndata.AnnData, pd.DataFrame], Union[anndata.AnnData, pd.DataFrame]]:
-    """
-    Adjust both input objects (either AnnData or DataFrame) to have the same
+    Adjust both DataFrame to have the same
     columns.
 
-    :param obj1: First object (either AnnData or DataFrame).
-    :type obj1: Union[anndata.AnnData, pd.DataFrame]
-    :param obj2: Second object (either AnnData or DataFrame).
-    :type obj2: Union[anndata.AnnData, pd.DataFrame]
-    :return: Tuple containing the adjusted objects.
-    :rtype: tuple
+    :param df1: First DataFrame.
+    :type df1: pd.DataFrame
+    :param df2: Second DataFrame.
+    :type df2: pd.DataFrame
+    :return: Tuple containing the adjusted DataFrames.
+    :rtype: Tuple[pd.DataFrame, pd.DataFrame]
     """
-
-    df1 = to_df(obj1)
-    df2 = to_df(obj2)
 
     # Get union of columns from both dataframes
     all_cols = df1.columns.union(df2.columns)
@@ -205,11 +156,7 @@ def pad_compatible(
     df1 = df1.reindex(columns=all_cols, fill_value=0)
     df2 = df2.reindex(columns=all_cols, fill_value=0)
 
-    # Now you can use this function in your code like this:
-    obj1 = to_obj(obj1, df1)
-    obj2 = to_obj(obj2, df2)
-
-    return obj1, obj2
+    return df1, df2
 
 
 def split_adata(adata: anndata.AnnData, col: str) -> Dict[str, anndata.AnnData]:
@@ -220,10 +167,10 @@ def split_adata(adata: anndata.AnnData, col: str) -> Dict[str, anndata.AnnData]:
     :param adata: Input AnnData object.
     :type adata: anndata.AnnData
     :param col: The column name in adata.obs based on which the splitting should
-    be done.
+        be done.
     :type col: str
     :return: Dictionary with unique values from the column as keys and
-    respective sub-AnnData objects as values.
+        respective sub-AnnData objects as values.
     :rtype: Dict[str, anndata.AnnData]
     """
 
@@ -231,29 +178,22 @@ def split_adata(adata: anndata.AnnData, col: str) -> Dict[str, anndata.AnnData]:
 
 
 def get_distance(
-    obj1: Union[anndata.AnnData, pd.DataFrame],
-    obj2: Union[anndata.AnnData, pd.DataFrame],
+    df1: pd.DataFrame,
+    df2: pd.DataFrame,
     metric: str | Callable = "euclidean",
 ) -> pd.DataFrame:
     """
-    Compute the distance between two objects (either AnnData or DataFrame) using
-    the specified metric.
+    Compute the distance between two DataFrames using the specified metric.
 
-    :param obj1: The first object (either AnnData or DataFrame).
-    :type obj1: Union[anndata.AnnData, pd.DataFrame]
-    :param obj2: The second object (either AnnData or DataFrame).
-    :type obj2: Union[anndata.AnnData, pd.DataFrame]
+    :param df1: The first DataFrames.
+    :type df1: pd.DataFrame
+    :param df2: The second DataFrame.
+    :type df2: pd.DataFrame
     :param metric: The distance metric to use. Defaults to "euclidean".
     :type metric: str, optional
     :return: A dataframe of distance values between the two objects.
     :rtype: pd.DataFrame
     """
-
-    df1 = to_df(obj1)
-    df2 = to_df(obj2)
-
-    # Ensure both dataframes have the same columns
-    df1, df2 = pad_compatible(df1, df2)
 
     # Convert dataframes to numpy arrays
     arr1 = df1.to_numpy()
@@ -282,6 +222,7 @@ def adjacent(iterable: Iterable, n: int = 2) -> Iterable[Tuple[Iterable, ...]]:
     :return: Iterable producing n-tuples of adjacent elements.
     :rtype: Iterable[Tuple[Iterable, ...]]
     """
+
     iterators = tee(iterable, n)
     for i, iterator in enumerate(iterators):
         for _ in range(i):
@@ -299,6 +240,7 @@ def parse_territory(territory: str) -> Tuple[str, int, str]:
     :return: A tuple with cell lineage, rounds of division, and cell number.
     :rtype: tuple[str, int, str]
     """
+
     match = re.match(r"^([ABab])(\d+)\.(\d+\**)$", territory)
     if match:
         lineage, rounds, cell_num = match.groups()
@@ -307,7 +249,10 @@ def parse_territory(territory: str) -> Tuple[str, int, str]:
 
 
 def map_cells(
-    adata: anndata.AnnData, pattern: np.ndarray
+    adata: anndata.AnnData,
+    pattern: np.ndarray,
+    basis: str = "PCs",
+    use_rep: str = "X_pca",
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Maps scRNAseq cells to blastomeres using a given pattern.
@@ -316,21 +261,21 @@ def map_cells(
     :type adata: anndata.AnnData
     :param pattern: Pattern to be used for mapping.
     :type pattern: np.ndarray
-
-    :return: A tuple with a dataframe with the cosine similarity of individual scRNAseq cells,
-             a dataframe with the mean cosine similarity of each Leiden cluster,
-             and the most similar blastomere for each Leiden cluster.
+    :param basis: Basis to be used from adata.varm. Default is "PCs".
+    :type basis: str
+    :param use_rep: Representation to be used from adata.obsm. Default is "X_pca".
+    :type use_rep: str
+    :return: A tuple with a dataframe with the cosine similarity of individual
+        scRNAseq cells, a dataframe with the mean cosine similarity of each
+        Leiden cluster, and the most similar blastomere for each Leiden cluster.
     :rtype: tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]
     """
 
-    pattern, adata = pad_compatible(pattern, adata)
-    sc.pp.normalize_total(adata, target_sum=1e4)
-    sc.pp.log1p(adata)
-    sc.tl.pca(adata, svd_solver="arpack")
+    pattern = pad_df_adata(pattern, adata)
 
     df_cells = 1 - get_distance(
-        pattern @ adata.varm["PCs"],
-        pd.DataFrame(adata.obsm["X_pca"], index=adata.obs_names),
+        pattern @ adata.varm[basis],
+        pd.DataFrame(adata.obsm[use_rep], index=adata.obs_names),
         "cosine",
     )
 
@@ -388,36 +333,15 @@ def plot_np(
     return ax
 
 
-def pca_raw(
-    adata: anndata.AnnData, target_sum: float = 1e4, svd_solver: str = "arpack"
-) -> anndata.AnnData:
-    """
-    Preprocesses the raw AnnData object by normalizing the total counts,
-    applying logarithmic transformation, and performing principal component
-    analysis (PCA).
-
-    :param adata: The input AnnData object.
-    :type adata: anndata.AnnData
-    :param target_sum: The target sum of counts after normalization, defaults to
-    1e4.
-    :type target_sum: float, optional
-    :param svd_solver: The solver to use for PCA, defaults to "arpack".
-    :type svd_solver: str, optional
-    :return: The preprocessed AnnData object.
-    :rtype: anndata.AnnData
-    """
-
-    sc.pp.normalize_total(adata, target_sum=target_sum)
-    sc.pp.log1p(adata)
-    sc.tl.pca(adata, svd_solver=svd_solver)
-    return adata
-
-
-def round_trip_distance(
-    adata1: anndata.AnnData, adata2: anndata.AnnData, name1: str, name2: str
+def cross_stage_distance(
+    adata1: anndata.AnnData,
+    adata2: anndata.AnnData,
+    name1: str,
+    name2: str,
+    use_rep: str = "X_pca",
 ) -> pd.DataFrame:
     """
-    Calculate the round trip distance between two AnnData objects.
+    Calculate the cross-stage distance between two AnnData objects.
 
     :param adata1: The first AnnData object.
     :type adata1: AnnData
@@ -427,20 +351,15 @@ def round_trip_distance(
     :type name1: str
     :param name2: The name of the second AnnData object.
     :type name2: str
-
+    :param use_rep: Representation to be used from adata.obsm. Default is "X_pca".
+    :type use_rep: str
     :return: The round trip distance matrix.
     :rtype: pd.DataFrame
     """
 
     t1 = get_distance(
-        pd.DataFrame(adata1.X @ adata2.varm["PCs"], index=adata1.obs_names),
-        pd.DataFrame(adata2.obsm["X_pca"], index=adata2.obs_names),
-        "cosine",
-    )
-
-    t2 = get_distance(
-        pd.DataFrame(adata2.X @ adata1.varm["PCs"], index=adata2.obs_names),
-        pd.DataFrame(adata1.obsm["X_pca"], index=adata1.obs_names),
+        pd.DataFrame(adata1.obsm[use_rep], index=adata1.obs_names),
+        pd.DataFrame(adata2.obsm[use_rep], index=adata2.obs_names),
         "cosine",
     )
 
@@ -459,26 +378,8 @@ def round_trip_distance(
         .reset_index()
     )
 
-    d2 = (
-        t2.melt(ignore_index=False, var_name="target", value_name="cos_theta")
-        .reset_index(names="source")
-        .merge(adata2.obs["leiden"], left_on=["source"], right_index=True)
-        .merge(
-            adata1.obs["leiden"],
-            left_on=["target"],
-            right_index=True,
-            suffixes=(f"_{name2}", f"_{name1}"),
-        )
-        .groupby([f"leiden_{name2}", f"leiden_{name1}"])["cos_theta"]
-        .mean()
-        .reset_index()
-    )
-
     d3 = d1.pivot(
         index=f"leiden_{name1}", columns=f"leiden_{name2}", values="cos_theta"
     )
-    d4 = d2.pivot(
-        index=f"leiden_{name2}", columns=f"leiden_{name1}", values="cos_theta"
-    )
 
-    return d3 + d4.T
+    return d3
