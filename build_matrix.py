@@ -2,7 +2,7 @@
 This module contains functions for analyzing gene expression data.
 """
 
-from typing import Dict, Tuple, Iterable, Callable
+from typing import Dict, List, Tuple, Iterable, Callable
 from itertools import tee
 import re
 
@@ -12,6 +12,7 @@ import anndata
 from sklearn.metrics import pairwise_distances
 import matplotlib.axes
 import geopandas as gpd
+import networkx as nx
 
 from .ontology import build_graph, node_to_leaves
 
@@ -383,3 +384,155 @@ def cross_stage_distance(
     )
 
     return d3
+
+
+def make_stage_name(stage: str) -> Callable[[str], str]:
+    """
+    Creates a function that appends a given cell name to a specified stage.
+
+    :param stage: The stage to be prefixed to the cell name.
+    :type stage: str
+    :return: A function that takes a cell name as input and returns a string
+        combining the stage and the cell name in the format "{stage}_{cell}".
+    :rtype: Callable[[str], str]
+    """
+
+    def make_name(cell: str) -> str:
+        return f"{stage}_{cell}"
+
+    return make_name
+
+
+def make_digraph(
+    d_adatas: Dict[str, anndata.AnnData],
+    stages: Iterable,
+    use_rep: str = None,
+) -> nx.DiGraph:
+    """
+    Create a directed graph (DiGraph) from single-cell data across different
+    stages.
+
+    This function constructs a directed graph where nodes represent cells from
+    different stages, and edges represent the distance between cells from
+    adjacent stages.
+
+    :param d_adatas: Dictionary of AnnData objects, where keys are stage
+        identifiers and values are AnnData objects containing single-cell data
+        for each stage.
+    :type d_adatas: Dict[anndata.AnnData]
+    :param stages: An iterable of stage identifiers, defining the order of
+        stages.
+    :type stages: Iterable
+    :param use_rep: Optional. The representation to use for computing distances.
+        If None, the default representation is used.
+    :type use_rep: str, optional
+    :return: A directed graph with weighted edges representing distances between
+        cells from adjacent stages.
+    :rtype: nx.DiGraph
+    """
+
+    dg = nx.DiGraph()
+
+    for k1, k2 in adjacent(stages):
+
+        df = cross_stage_distance(
+            d_adatas[k1],
+            d_adatas[k2],
+            k1,
+            k2,
+            use_rep=use_rep,
+        )
+
+        edges = df.stack().reset_index()
+        edges.columns = ["source", "target", "weight"]
+        edges["source"] = edges["source"].apply(make_stage_name(k1))
+        edges["target"] = edges["target"].apply(make_stage_name(k2))
+        dg.add_weighted_edges_from(edges.values)
+
+    return dg
+
+
+class CrossStage:
+    """
+    CrossStage class for managing and updating shortest paths in a directed
+    graph.
+
+    :param graph: The directed graph on which shortest paths are calculated.
+    :type graph: nx.DiGraph
+    :param nodes_start: A list of starting node identifiers.
+    :type nodes_start: List[str]
+    :param nodes_end: A list of ending node identifiers.
+    :type nodes_end: List[str]
+    """
+
+    def __init__(self, graph: nx.DiGraph, nodes_start: List[str], nodes_end: List[str]):
+        self.graph = graph
+        self.update_internal(nodes_start, nodes_end)
+
+    def update_internal(self, nodes_start: List[str], nodes_end: List[str]):
+        """
+        Updates the internal shortest paths data structures for the given start
+            and end nodes.
+
+        This method calculates the shortest paths between each pair of nodes
+        from `nodes_start` to `nodes_end`
+        using Dijkstra's algorithm with edge weights. It updates two internal
+        attributes:
+        - ``self.df_shortest_paths``: A DataFrame containing the shortest path
+            distances from each source node
+        - ``self.d_shortest_paths``: A dictionary where keys are tuples of
+            (source, target) nodes and values
+
+        :param nodes_start: A list of starting node identifiers.
+        :type nodes_start: List[str]
+        :param nodes_end: A list of ending node identifiers.
+        :type nodes_end: List[str]
+        """
+
+        self.df_shortest_paths = (
+            pd.DataFrame(
+                [
+                    {
+                        "source": s,
+                        "target": t,
+                        "distance": nx.shortest_path_length(
+                            self.graph,
+                            source=s,
+                            target=t,
+                            weight="weight",
+                        ),
+                    }
+                    for s in nodes_start
+                    for t in nodes_end
+                ]
+            )
+            .groupby("source")
+            .apply(lambda x: x.nsmallest(1, "distance"))
+            .reset_index(drop=True)
+            .set_index("source")
+        )
+
+        self.d_shortest_paths = {
+            (s, t): nx.shortest_path(
+                self.graph,
+                source=s,
+                target=t,
+                weight="weight",
+            )
+            for s in nodes_start
+            for t in nodes_end
+        }
+
+    def find_paths(self, source: str) -> List[str]:
+        """
+        Finds the shortest paths from a given source node to all target nodes.
+
+        :param source: The source node identifier.
+        :type source: str
+        :return: A list containing the nodes on the shortest paths from the
+            source node.
+        :rtype: List[str]
+        """
+        return self.d_shortest_paths[
+            source, self.df_shortest_paths.loc[source]["target"]
+        ]
