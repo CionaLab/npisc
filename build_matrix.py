@@ -285,7 +285,7 @@ def map_cells(
     )
 
     df_map = pd.DataFrame(
-        {"cluster": df_leiden.idxmax(axis=0), "cos_theta": df_leiden.max(axis=0)}
+        {"leiden": df_leiden.idxmax(axis=0), "cos_theta": df_leiden.max(axis=0)}
     )
 
     return df_cells, df_leiden, df_map
@@ -322,7 +322,7 @@ def plot_np(
     gdf.plot(ax=ax, **gpd_kwds)
     gdf.apply(
         lambda x: ax.annotate(
-            text=f"{x['cluster']}",
+            text=f"{x['leiden']}",
             xy=x.geometry.centroid.coords[0],
             ha="center",
             **anno_kwds,
