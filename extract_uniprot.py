@@ -3,6 +3,9 @@ import sys
 
 import pandas as pd
 
+# Latest release at:
+# https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000005640/UP000005640_9606.dat.gz
+
 # State machine constants
 STATE_INITIAL = 0
 STATE_AC = 1
