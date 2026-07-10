@@ -1,4 +1,5 @@
 # Neural Plate in situ Integration with Single Cell
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21298268.svg)](https://doi.org/10.5281/zenodo.21298268)
 
 This repository hosts the code for **Neural Plate in situ Integration with Single Cell** (NPISC).
 
