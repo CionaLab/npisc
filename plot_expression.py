@@ -110,7 +110,7 @@ pattern_dfs = {
 # %%
 jaccard_dfs = {
     stage: pd.DataFrame(
-        pairwise_distances(pattern_df, metric=jaccard),
+        1 - pairwise_distances(pattern_df, metric=jaccard),
         index=pattern_df.index,
         columns=pattern_df.index,
     )
@@ -157,7 +157,7 @@ for stage, _, _ in STAGES:
         xticklabels=True,
         yticklabels=True,
     )
-    g.ax_heatmap.set_title(f"Jaccard Distance - {stage}")
+    g.ax_heatmap.set_title(f"Jaccard Similarity - {stage}")
     g.ax_heatmap.set_xlabel("Blastomeres")
     g.ax_heatmap.set_ylabel("Blastomeres")
     g.ax_heatmap.set_xticklabels(
